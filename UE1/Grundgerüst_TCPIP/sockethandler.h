@@ -1,0 +1,2 @@
+
+int initSocketStream(int port);
