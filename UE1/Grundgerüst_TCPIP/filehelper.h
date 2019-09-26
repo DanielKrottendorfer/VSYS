@@ -1,5 +1,5 @@
-#ifndef HEADER_FILE
-#define HEADER_FILE
+#ifndef FIEL_HELPER
+#define FIEL_HELPER
 
     int doesDirectoryExist(char* d);
 

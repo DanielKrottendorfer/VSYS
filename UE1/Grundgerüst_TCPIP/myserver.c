@@ -10,7 +10,8 @@
 #define BUF 1024
 #define PORT 6543
 
-#include "filehandler.h"
+#include "filehelper.h"
+#include "sockethelper.h"
 
 int main (int argc, char **argv) {
 
@@ -21,49 +22,45 @@ int main (int argc, char **argv) {
    }
 
    char* dir = argv[1];
-
    if(!doesDirectoryExist(dir)){
       exit(EXIT_FAILURE);
    }
 
-   int create_socket, new_socket;
-   socklen_t addrlen;
-   char buffer[BUF];
-   int size;
-   struct sockaddr_in address, cliaddress;
-
-   create_socket = socket (AF_INET, SOCK_STREAM, 0);
-
-   memset(&address,0,sizeof(address));
-   address.sin_family = AF_INET;
-   address.sin_addr.s_addr = INADDR_ANY;
-   address.sin_port = htons (PORT);
-
-   if (bind ( create_socket, (struct sockaddr *) &address, sizeof (address)) != 0) {
-      perror("bind error");
-      return EXIT_FAILURE;
+   int server_socket;
+   struct sockaddr_in address;
+   if(initServersocket(&server_socket,&address,PORT) != 0){
+      printf("Failed to initialice Serversocket\n");
+      exit(EXIT_FAILURE);
    }
-   listen (create_socket, 5);
 
+
+   socklen_t addrlen;
    addrlen = sizeof (struct sockaddr_in);
+   int message_size;
+   struct sockaddr_in cliaddress;
+   int client_socket;
+   char buffer[BUF];
 
    while (1) {
       printf("Waiting for connections...\n");
-      new_socket = accept ( create_socket, (struct sockaddr *) &cliaddress, &addrlen );
-      if (new_socket > 0)
+      client_socket = accept ( server_socket, (struct sockaddr *) &cliaddress, &addrlen );
+      if (client_socket > 0)
       {
          printf ("Client connected from %s:%d...\n", inet_ntoa (cliaddress.sin_addr),ntohs(cliaddress.sin_port));
          strcpy(buffer,"Welcome to myserver, Please enter your command:\n");
-         send(new_socket, buffer, strlen(buffer),0);
+         send(client_socket, buffer, strlen(buffer),0);
       }
+
       do {
-         size = recv (new_socket, buffer, BUF-1, 0);
-         if( size > 0)
+         message_size = recv (client_socket, buffer, BUF-1, 0);
+         if( message_size > 0)
          {
-            buffer[size] = '\0';
+            buffer[message_size] = '\0';
             printf ("Message received: %s\n", buffer);
+            printf ("abc0\n");
+            handleMessage(buffer, dir, client_socket);
          }
-         else if (size == 0)
+         else if (message_size == 0)
          {
             printf("Client closed remote socket\n");
             break;
@@ -74,9 +71,9 @@ int main (int argc, char **argv) {
             return EXIT_FAILURE;
          }
       } while (strncmp (buffer, "quit", 4)  != 0);
-      close (new_socket);
+      close (client_socket);
    }
-   close (create_socket);
+   close (server_socket);
 
    return EXIT_SUCCESS;
 }
