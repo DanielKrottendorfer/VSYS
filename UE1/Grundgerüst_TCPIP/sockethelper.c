@@ -35,8 +35,6 @@ int sendMessage(char* buffer, char* mailpath){
 
     for(int i=0 ; temp[i] != '\n' ; i++){
         reciever[i] = temp[i];
-        printf("abc3 %s\n",reciever);
-        sleep(1);
     }
 
     printf("%s",reciever);
