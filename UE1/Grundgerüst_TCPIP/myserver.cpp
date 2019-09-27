@@ -6,9 +6,11 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #define BUF 1024
 #define PORT 6543
+
+#include <string>
+using namespace std;
 
 #include "filehelper.h"
 #include "sockethelper.h"
@@ -21,10 +23,11 @@ int main (int argc, char **argv) {
       exit(EXIT_FAILURE);
    }
 
-   char* dir = argv[1];
-   if(!doesDirectoryExist(dir)){
+   string dir(argv[1]);
+   if(doesDirectoryExist(dir.c_str()) != 0){
       exit(EXIT_FAILURE);
    }
+   dir.append(1,'/');
 
    int server_socket;
    struct sockaddr_in address;
@@ -56,8 +59,6 @@ int main (int argc, char **argv) {
          if( message_size > 0)
          {
             buffer[message_size] = '\0';
-            printf ("Message received: %s\n", buffer);
-            printf ("abc0\n");
             handleMessage(buffer, dir, client_socket);
          }
          else if (message_size == 0)

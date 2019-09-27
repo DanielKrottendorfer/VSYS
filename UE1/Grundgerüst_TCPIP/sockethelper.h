@@ -15,6 +15,6 @@
     int listMessages(char* buffer, char* mailpath, int socket);
     int readMessage(char* buffer, char* mailpath, int socket);
     int deleteMessage(char* buffer, char* mailpath, int socket);
-    int handleMessage(char* buffer,char* mailpath,int socket);
+    int handleMessage(char* buffer,string mailpath,int socket);
 
 #endif

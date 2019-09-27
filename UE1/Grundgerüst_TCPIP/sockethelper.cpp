@@ -1,6 +1,7 @@
 /* myserver.c */
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -27,35 +28,63 @@ int initServersocket(int* server_socket, struct sockaddr_in* address, int port){
    return EXIT_SUCCESS;
 }
 
-int sendMessage(char* buffer, char* mailpath){
+#include <string>
+#include <sstream>
+#include <iostream>
+
+#include "filehelper.h"
+
+using namespace std;
+
+int sendMessage(char* buffer, string mailpath){
+
+    string reciever;    
+    string betreff;    
+    string message;
 
     char* temp = &buffer[1];
+    istringstream f(temp);
 
-    char reciever[9] = "        \n";
+    getline(f, reciever);
+    getline(f, betreff);
+    getline(f, message);
 
-    for(int i=0 ; temp[i] != '\n' ; i++){
-        reciever[i] = temp[i];
+
+    if( doesDirectoryExist( (mailpath + reciever ).c_str() ) != 0 )
+    {
+        mkdir((mailpath + reciever).c_str(),0700);
     }
 
-    printf("%s",reciever);
+    reciever.append(1,'/');
+
+    FILE* file = fopen((mailpath + reciever + betreff ).c_str(),"w");
+
+    if(file == nullptr){
+        printf("ERROR ON FOPEN\n");
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(file,"%s",message.c_str());   
+    fclose(file);
+
+    return EXIT_SUCCESS;
+
+}
+
+int listMessages(char* buffer, string mailpath, int socket){
 
     return EXIT_SUCCESS;
 }
-
-int listMessages(char* buffer, char* mailpath, int socket){
-
-    return EXIT_SUCCESS;
-}
-int readMessage(char* buffer, char* mailpath, int socket){
+int readMessage(char* buffer, string mailpath, int socket){
 
     return EXIT_SUCCESS;
 }
-int deleteMessage(char* buffer, char* mailpath, int socket){
+int deleteMessage(char* buffer, string mailpath, int socket){
 
     return EXIT_SUCCESS;
 }
 #include <unistd.h>
-int handleMessage(char* buffer, char* mailpath, int socket){
+int handleMessage(char* buffer, string mailpath, int socket){
 
     int requestType = *buffer -48;
 

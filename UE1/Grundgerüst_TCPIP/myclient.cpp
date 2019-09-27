@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 #define BUF 1024
 #define PORT 6543
 
@@ -48,12 +49,12 @@ int main (int argc, char **argv) {
      return EXIT_FAILURE;
   }
 
-  do {
-     printf ("Send message: ");
-     fgets (buffer, BUF, stdin);
-     send(create_socket, buffer, strlen (buffer), 0);
-  } 
-  while (strcmp (buffer, "quit\n") != 0);
+  //do {
+     printf ("Send message: \n");
+     //fgets (buffer, BUF, stdin);
+     char buffer2[BUF] = "0if18b030\nhalt die Fresse\nichbringdiechum\0";
+     send(create_socket, buffer2, strlen (buffer2), 0);
+  //} while (strcmp (buffer, "quit\n") != 0);
   close (create_socket);
   return EXIT_SUCCESS;
 }

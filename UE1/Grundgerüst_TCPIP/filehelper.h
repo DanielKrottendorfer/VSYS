@@ -1,6 +1,6 @@
 #ifndef FIEL_HELPER
 #define FIEL_HELPER
 
-    int doesDirectoryExist(char* d);
+    int doesDirectoryExist(const char* d);
 
 #endif

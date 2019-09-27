@@ -1,10 +1,10 @@
 all: client server
 
-client: myclient.c
-	gcc -Wall myclient.c filehelper.c sockethelper.c -o myclient
+client: myclient.cpp
+	g++ -Wall myclient.cpp filehelper.c sockethelper.cpp -o myclient
 
-server: myserver.c
-	gcc -Wall myserver.c filehelper.c sockethelper.c -o myserver
+server: myserver.cpp
+	g++ -Wall myserver.cpp filehelper.c sockethelper.cpp -o myserver
 
 clean:
 	rm myclient
