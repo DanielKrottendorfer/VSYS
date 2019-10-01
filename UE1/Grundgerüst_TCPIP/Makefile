@@ -1,11 +1,11 @@
-all: client server
+all: clientTest server
 
-client: myclient.cpp
-	g++ -Wall myclient.cpp filehelper.c sockethelper.cpp -o myclient
+clientTest: clientTest.cpp
+	g++ -Wall clientTest.cpp filehelper.c sockethelper.cpp -o clientTest
 
 server: myserver.cpp
 	g++ -Wall myserver.cpp filehelper.c sockethelper.cpp -o myserver
 
 clean:
-	rm myclient
+	rm clientTest
 	rm myserver

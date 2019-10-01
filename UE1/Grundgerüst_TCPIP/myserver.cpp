@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #define BUF 1024
 #define PORT 6543
 
@@ -59,7 +60,8 @@ int main (int argc, char **argv) {
          if( message_size > 0)
          {
             buffer[message_size] = '\0';
-            handleMessage(buffer, dir, client_socket);
+            string message(buffer);
+            handleMessage(message, dir, client_socket);
          }
          else if (message_size == 0)
          {
