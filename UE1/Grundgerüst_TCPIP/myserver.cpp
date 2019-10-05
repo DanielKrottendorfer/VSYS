@@ -40,9 +40,10 @@ int main (int argc, char **argv) {
 
    socklen_t addrlen;
    addrlen = sizeof (struct sockaddr_in);
-   int message_size;
    struct sockaddr_in cliaddress;
    int client_socket;
+
+   int message_size;
    char buffer[BUF];
 
    while (1) {

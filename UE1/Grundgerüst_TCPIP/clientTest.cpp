@@ -13,9 +13,7 @@
 
 int main (int argc, char **argv) {
   int create_socket;
-  char buffer[BUF];
   struct sockaddr_in address;
-  int size;
 
 
   if ((create_socket = socket (AF_INET, SOCK_STREAM, 0)) == -1)
@@ -28,6 +26,9 @@ int main (int argc, char **argv) {
   address.sin_family = AF_INET;
   address.sin_port = htons (PORT);
   inet_aton ("127.0.0.1", &address.sin_addr);
+
+  char buffer[BUF];
+  int size;
 
   if (connect ( create_socket, (struct sockaddr *) &address, sizeof (address)) == 0)
   {
@@ -85,9 +86,6 @@ int main (int argc, char **argv) {
       buffer[size]= '\0';
       printf("%s\n",buffer);
    }
-
-
-
    
    close (create_socket);
    return EXIT_SUCCESS;
