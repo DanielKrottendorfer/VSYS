@@ -10,9 +10,37 @@
 #include <string.h>
 #include <dirent.h>
 
+#include <cstdlib>
+#include <climits>
 #include <string>
+#include <iostream>
+
+using namespace std;
+
+#include "messagehandler.hpp"
 
 #include "filehelper.h"
+
+
+std::hash<std::string> hash_fn;
+
+int absolut(int a){
+    if(a<0)
+    {
+        return -a;
+    }
+    else
+    {
+        return a;
+    }
+}
+
+int getThreeDigitHash(string s)
+{
+    int hash =  absolut(hash_fn(s));
+    hash%=1000;
+    return hash;
+}
 
 std::string cutOffTillChar(std::string *str, const char r)
 {
@@ -38,148 +66,160 @@ std::string cutOffTillChar(std::string *str, const char r)
 
 using namespace std;
 
-int sendMessage(string message, string mailpath)
+int saveMessage(string message, string mailpath)
 {
+    string sender = cutOffTillChar(&message,'\n');
+    string reciever = cutOffTillChar(&message,'\n');
+    string topic = cutOffTillChar(&message,'\n');
 
-    string sender = cutOffTillChar(&message, '\n');
-    string reciever = cutOffTillChar(&message, '\n');
-    string subject = cutOffTillChar(&message, '\n');
-
-    if (doesDirectoryExist((mailpath + reciever).c_str()) != 0)
+    if( doesDirectoryExist( (mailpath+"/"+reciever).c_str() ) != 0 )
     {
-        mkdir((mailpath + reciever).c_str(), 0700);
+        mkdir((mailpath+"/"+reciever).c_str(), 0700);
     }
 
-    reciever.append(1, '/');
+    int hash = getThreeDigitHash(topic);
 
-    FILE *file = fopen((mailpath + reciever + subject).c_str(), "w");
+    FILE * fp;
+    fp = fopen ( (mailpath+"/"+reciever+"/"+ to_string(hash) + " " + topic).c_str() , "w+");
 
-    if (file == nullptr)
-    {
-        printf("ERROR ON FOPEN\n");
-        exit(EXIT_FAILURE);
-    }
+    fprintf(fp, "%s" , ("Von "+sender+"\n\n").c_str());
+    fprintf(fp, "%s" , message.c_str());
 
-    fprintf(file, "%s", ("Von " + sender + ",\n\n" + message).c_str());
-    fclose(file);
+    fclose(fp);
 
     return EXIT_SUCCESS;
 }
 
-int listMessages(string message, string mailpath, ClientSocket socket)
+int listMessages(string message, string mailpath, ClientSocket* socket)
 {
-
     string user = message;
     string answer;
 
-    if (doesDirectoryExist((mailpath + user).c_str()) != 0)
+    if ( doesDirectoryExist((mailpath+"/"+user).c_str()) != 0 )
     {
-        socket.sendMessage("0");
+        socket->sendMessage("0");
+        return EXIT_FAILURE;
     }
     else
     {
-
         DIR *d;
         struct dirent *dir;
-        d = opendir((mailpath + user).c_str());
-
-        int i = 0;
-
-        if (d)
+        d = opendir((mailpath+"/"+user).c_str());
+        if (d != NULL)
         {
+            int i = 0;
             while ((dir = readdir(d)) != NULL)
             {
                 if (dir->d_name[0] != '.')
                 {
                     i++;
-                    answer += to_string(i) + " ";
                     answer += dir->d_name;
                     answer += '\n';
                 }
             }
             closedir(d);
+            socket->sendMessage(to_string(i)+"\n"+answer);
         }
-        socket.sendMessage(answer);
+        return EXIT_SUCCESS;
     }
-    return EXIT_SUCCESS;
 }
-int readMessage(string message, string mailpath, ClientSocket socket)
+
+int readMessage(string message, string mailpath, ClientSocket* socket)
 {
 
-    string user = cutOffTillChar(&message, '\n');
-    string answer;
-    string sn = cutOffTillChar(&message, '\n');
-    int subjectNumber = -1;
+    string user = cutOffTillChar(&message,'\n');
+    string id = cutOffTillChar(&message,'\n');
 
-    subjectNumber = stoi(sn);
-
-    if (doesDirectoryExist((mailpath + user).c_str()) != 0)
+    if ( doesDirectoryExist((mailpath+"/"+user).c_str()) != 0 )
     {
-        answer = "User does not exist! \n";
-        printf("!!doesDirectoryExist\n");
+        socket->sendMessage("ERR");
+        return EXIT_FAILURE;
     }
     else
     {
-
         DIR *d;
         struct dirent *dir;
-        string dirName;
-        d = opendir((mailpath + user).c_str());
-
-        int i = 0;
-
-        if (d)
+        d = opendir((mailpath+"/"+user).c_str());
+        if (d != NULL)
         {
-            while ((dir = readdir(d)) != NULL && subjectNumber > i)
+            while ((dir = readdir(d)) != NULL)
             {
                 if (dir->d_name[0] != '.')
                 {
-                    i++;
-                    if (i == subjectNumber)
-                        break;
+                    string temp(dir->d_name);
+                    if(temp.find(id) == 0){
+
+                        FILE* f = fopen( (mailpath+"/"+user+"/"+temp).c_str(), "r" );
+                        if (f==NULL) {fputs ("File error",stderr); exit (1);}
+
+                        fseek (f , 0 , SEEK_END);
+                        long lSize = ftell (f);
+                        rewind(f);
+
+                        char* buffer = (char*) malloc (sizeof(char)*lSize);
+                        if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
+
+                        int result = fread (buffer,1,lSize,f);
+                        if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
+
+                        socket->sendMessage(string(buffer));
+
+                        fclose(f);
+                        closedir(d);
+                        return EXIT_SUCCESS;
+
+                    }
                 }
             }
-            dirName = dir->d_name;
+            socket->sendMessage("ERR");
             closedir(d);
         }
-
-        user.append(1, '/');
-        printf("app %s\n", (mailpath + user + dirName).c_str());
-        FILE *fp = fopen((mailpath + user + dirName).c_str(), "r"); // read mode
-
-        if (fp == NULL)
-        {
-            perror("Error while opening the file.\n");
-            exit(EXIT_FAILURE);
-        }
-
-        char ch;
-        while ((ch = fgetc(fp)) != EOF)
-        {
-            answer += ch;
-        }
-        fclose(fp);
+        return EXIT_FAILURE;
     }
-
-    socket.sendMessage(answer);
-
-    return EXIT_SUCCESS;
 }
-int deleteMessage(string message, string mailpath, ClientSocket socket)
+int deleteMessage(string message, string mailpath, ClientSocket* socket)
 {
     string user = cutOffTillChar(&message,'\n');
-    string subject = message;
+    string id = cutOffTillChar(&message,'\n');
 
-    if(remove( (mailpath+'/'+user+'/'+subject).c_str() ) != 0)
-        socket.sendMessage("Something went wrong !");
+    if ( doesDirectoryExist((mailpath+"/"+user).c_str()) != 0 )
+    {
+        socket->sendMessage("ERR");
+        return EXIT_FAILURE;
+    }
     else
-        socket.sendMessage("ok");
-    
-
-    return EXIT_SUCCESS;
+    {
+        DIR *d;
+        struct dirent *dir;
+        d = opendir((mailpath+"/"+user).c_str());
+        if (d != NULL)
+        {
+            while ((dir = readdir(d)) != NULL)
+            {
+                if (dir->d_name[0] != '.')
+                {
+                    string temp(dir->d_name);
+                    if(temp.find(id) == 0){
+                        string tmep(dir->d_name);
+                        if( remove( (mailpath+'/'+user+'/'+temp).c_str() ) != 0 )
+                        {
+                            socket->sendMessage("Something went wrong");
+                        }else {
+                            socket->sendMessage("Ok");
+                        }
+                        closedir(d);
+                        return EXIT_SUCCESS;
+                    }
+                }
+            }
+            socket->sendMessage("ERR");
+            closedir(d);
+        }
+        return EXIT_FAILURE;
+    }
 }
 
-int handleMessage(string message, string mailpath, ClientSocket socket)
+int handleMessage(string message, string mailpath, ClientSocket* socket)
 {
 
     int requestType = cutOffTillChar(&message, '\n')[0] - '0';
@@ -195,7 +235,7 @@ int handleMessage(string message, string mailpath, ClientSocket socket)
     switch (requestType)
     {
     case 0:
-        sendMessage(message, mailpath);
+        saveMessage(message, mailpath);
         break;
     case 1:
         listMessages(message, mailpath, socket);

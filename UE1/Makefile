@@ -1,7 +1,7 @@
 all: directories server testclient testserver
 
 server: mailserver.cpp
-	g++ -Wall mailserver.cpp ServerSocket.cpp ClientSocket.cpp filehelper.c sockethelper.c -o ./executables/mailserver
+	g++ -Wall mailserver.cpp ServerSocket.cpp ClientSocket.cpp messagehandler.cpp filehelper.c sockethelper.c -o ./executables/mailserver
 
 testclient: testclient.cpp
 	g++ -Wall testclient.cpp ClientSocket.cpp -o ./executables/testclient

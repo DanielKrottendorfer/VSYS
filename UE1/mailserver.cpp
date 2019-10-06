@@ -12,9 +12,9 @@ using namespace std;
 //My Imports
 #include "ServerSocket.hpp"
 #include "ClientSocket.hpp"
-#include "filehelper.h"
+#include "messagehandler.hpp"
 
-#include "messagehandler.cpp"
+#include "filehelper.h"
 
 int main(int argc, char **argv)
 {
@@ -31,7 +31,6 @@ int main(int argc, char **argv)
    }
 
    string dir(argv[1]);
-   dir.append(1,'/');
 
    ServerSocket s(12345);
 
@@ -47,7 +46,7 @@ int main(int argc, char **argv)
          if( size > 0)
          {
             printf("Message received: \n%s\n", message.c_str());
-            handleMessage(message, dir, c);
+            handleMessage(message, dir, &c);
          }
          else if (size == 0)
          {

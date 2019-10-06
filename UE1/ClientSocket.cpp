@@ -66,6 +66,5 @@ int ClientSocket::recieveMessage(string& s)
 
 ClientSocket::~ClientSocket()
 {
-    printf("closing clientsocket\n");
     close(this->client_socket);
 }
