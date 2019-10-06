@@ -14,6 +14,7 @@ class ClientSocket
     private:
         struct sockaddr_in client_address;
         int client_socket;
+        char buffer[BUF];
     public:
     
         static ClientSocket connectToSocket(string ip, int port);

@@ -30,7 +30,7 @@ ClientSocket ClientSocket::connectToSocket(string ip, int port)
         exit(EXIT_FAILURE);
     }
 
-    memset(&address,0,sizeof(address));
+    memset(&address, 0, sizeof(address));
     address.sin_family = AF_INET;
     address.sin_port = htons (port);
     inet_aton (ip.c_str(), &address.sin_addr);
@@ -45,7 +45,7 @@ ClientSocket ClientSocket::connectToSocket(string ip, int port)
         exit(EXIT_FAILURE);
     }
 
-    return ClientSocket(address,client_socket);
+    return ClientSocket(address, client_socket);
 }
 
 int ClientSocket::sendMessage(string message)
@@ -55,17 +55,17 @@ int ClientSocket::sendMessage(string message)
 
 int ClientSocket::recieveMessage(string& s)
 {
-    char buffer[BUF];
-    int size=recv(this->client_socket,buffer,BUF-1, 0);
+    int size=recv(this->client_socket, this->buffer, BUF-1, 0);
     if (size>0)
     {
-        buffer[size]= '\0';
+        this->buffer[size]= '\0';
+        s = string(this->buffer);
     }
-    s = string(buffer);
     return size;
 }
 
 ClientSocket::~ClientSocket()
 {
-    close(client_socket);
+    printf("closing clientsocket\n");
+    close(this->client_socket);
 }

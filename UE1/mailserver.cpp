@@ -14,6 +14,8 @@ using namespace std;
 #include "ClientSocket.hpp"
 #include "filehelper.h"
 
+#include "messagehandler.cpp"
+
 int main(int argc, char **argv)
 {
    /*
@@ -31,8 +33,6 @@ int main(int argc, char **argv)
    string dir(argv[1]);
    dir.append(1,'/');
 
-
-
    ServerSocket s(12345);
 
    while (1)
@@ -46,7 +46,8 @@ int main(int argc, char **argv)
          int size = c.recieveMessage(message);
          if( size > 0)
          {
-            printf ("Message received: %s\n", message.c_str());
+            printf("Message received: \n%s\n", message.c_str());
+            handleMessage(message, dir, c);
          }
          else if (size == 0)
          {
@@ -55,8 +56,8 @@ int main(int argc, char **argv)
          }
          else
          {
-            perror("recv error");
-            return EXIT_FAILURE;
+            perror("Client disconnected");
+            break;
          }
       }while (strncmp (message.c_str(), "quit", 4)  != 0);
       

@@ -31,21 +31,22 @@ ClientSocket ServerSocket::acceptClient()
 {
     socklen_t addrlen;
     addrlen = sizeof(struct sockaddr_in);
-    struct sockaddr_in cliaddress;
+    struct sockaddr_in clientaddress;
     int client_socket;
 
     printf("Waiting for connections...\n");
-    client_socket = accept ( this->server_socket, (struct sockaddr *) &cliaddress, &addrlen );
+    client_socket = accept ( this->server_socket, (struct sockaddr *) &clientaddress, &addrlen );
     if (client_socket > 0)
     {
-        printf ("Client connected from %s:%d...\n", inet_ntoa (cliaddress.sin_addr),ntohs(cliaddress.sin_port));
+        printf ("Client connected from %s:%d...\n", inet_ntoa (clientaddress.sin_addr),ntohs(clientaddress.sin_port));
         std::string message = "Welcome to myserver, Please enter your command:\n";
         send(client_socket, message.c_str(), message.length(),0);
     }
-    return ClientSocket(cliaddress, client_socket);
+    return ClientSocket(clientaddress, client_socket);
 }
 
 ServerSocket::~ServerSocket()
 {
+    printf("closing server socket\n");
     close(this->server_socket);
 }
