@@ -9,7 +9,10 @@
 #include <string.h>
 #include <string>
 #define BUF 1024
+#define GOODEIGHTIES 80
+#define USERNAMEHEADER 8
 #define PORT 6543
+#define TEXTMAILSS 926
 
 int main (int argc, char **argv) {
   int create_socket;
@@ -21,7 +24,7 @@ int main (int argc, char **argv) {
      perror("Socket error");
      return EXIT_FAILURE;
   }
-  
+
   memset(&address,0,sizeof(address));
   address.sin_family = AF_INET;
   address.sin_port = htons (PORT);
@@ -46,7 +49,34 @@ int main (int argc, char **argv) {
      return EXIT_FAILURE;
   }
 
-   
+
+  while (strcmp (buffer, "quit\n") != 0)
+  {
+     printf ("What do you want to do?\n[S]end\n[L]ist\n[R]ead\n[D]elete\n[Q]uit\n");
+     std::cin >> messageType;
+     if(messageType == 'S' || 's')
+     {
+     printf ("Your Username?\n");
+     fgets (sender, USERNAMEHEADER, stdin);
+     printf ("To whom should this mail go to?\n");
+     fgets (empfaenger, USERNAMEHEADER, stdin);
+     printf ("What is the header of the mail?\n");
+     fgets (betreff, GOODEIGHTIES, stdin);
+     printf ("Write the big Message you got mate\n");
+     fgets (textMail, TEXTMAILSS, stdin);
+
+     string messageType2 = messageType
+
+     buffer = messageType + sender + "\n" + betreff + "\n" + textMail + "\0";
+     //char buffer2[BUF] = "0if18b159\nhalt die Fresse\nichbringdiechum\0";
+     //send(create_socket, buffer2, strlen (buffer2), 0);
+     send(create_socket, buffer, strlen (buffer), 0);
+     printf("%s", buffer);
+   }
+  close (create_socket);
+  return EXIT_SUCCESS;
+}
+
    printf ("Send message: \n");
    char buffer1[BUF] =   "0\nif18b030\nMarius\nAre you gay?\nMeele ist ein verbuggtes Drecksgame \0";
    send(create_socket, buffer1, strlen (buffer1), 0);
@@ -63,7 +93,7 @@ int main (int argc, char **argv) {
       printf("%s\n",buffer);
    }
    sleep(1);
-   
+
    printf ("Read message: \n");
    char buffer3[BUF] =   "2\nMarius\n0 \0";
    send(create_socket, buffer3, strlen (buffer3), 0);
@@ -75,7 +105,7 @@ int main (int argc, char **argv) {
       printf("%s\n",buffer);
    }
    sleep(1);
-   
+
    printf ("Read message: \n");
    char buffer4[BUF] =   "3\nMarius\nAre you gay?\0";
    send(create_socket, buffer4, strlen (buffer4), 0);
@@ -86,7 +116,7 @@ int main (int argc, char **argv) {
       buffer[size]= '\0';
       printf("%s\n",buffer);
    }
-   
+
    close (create_socket);
    return EXIT_SUCCESS;
 }
