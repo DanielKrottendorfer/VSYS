@@ -10,11 +10,15 @@
 #define TEXTMAILSS 927
 using namespace std;
 
+void trimStirng(string& s)
+{
+    s.erase(s.find_last_not_of(" \n\r\t")+1);
+}
+
 int main (int argc, char **argv) {
-    {
         if( argc < 2 )
         {
-          printf("Usage: %s ServerAdresse\n", argv[0]);
+          printf("Usage: %s ServerAdresse:Port\n", argv[0]);
           exit(EXIT_FAILURE);
         }
 
@@ -53,11 +57,12 @@ int main (int argc, char **argv) {
 
              string messageType2(messageType);
 
-             buffer = "0\n" + empfaengerString + senderString + betreffString + textMailString;
+             buffer = "0\n" + senderString + empfaengerString + betreffString + textMailString;
              //char buffer2[BUF] = "0if18b159\nhalt die Fresse\nichbringdiechum\0";
              //send(create_socket, buffer2, strlen (buffer2), 0);
+             trimStirng(buffer);
              cs.sendMessage(buffer);
-             std::cout << buffer << std::endl;
+             printf("%s\n",buffer.c_str());
          }
          if(messageType[0] == 'L' || messageType[0] == 'l')
          {
@@ -66,13 +71,14 @@ int main (int argc, char **argv) {
            fgets (bufferChar, USERNAMEHEADER, stdin);
            buffer = bufferChar;
            buffer = "1\n" + buffer;
+           trimStirng(buffer);
            cs.sendMessage(buffer);
            cs.recieveMessage(message);
            printf("%s\n",message.c_str());
          }
          if(messageType[0] == 'R' || messageType[0] == 'r')
          {
-           printf("What's your username?");
+           printf("What's your username?\n");
            char bufferChar[USERNAMEHEADER];
            fgets (bufferChar, USERNAMEHEADER, stdin);
            buffer = bufferChar;
@@ -80,13 +86,14 @@ int main (int argc, char **argv) {
            char index[USERNAMEHEADER];
            fgets (index, USERNAMEHEADER, stdin);
            buffer = "2\n" + buffer + index;
+           trimStirng(buffer);
            cs.sendMessage(buffer);
            cs.recieveMessage(message);
-           printf("%s\n",message.c_str());
+           printf("%s\n\n",message.c_str());
          }
          if(messageType[0] == 'D' || messageType[0] == 'd')
          {
-           printf("What's your username?");
+           printf("What's your username?\n");
            char bufferChar[USERNAMEHEADER];
            fgets (bufferChar, USERNAMEHEADER, stdin);
            buffer = bufferChar;
@@ -94,12 +101,14 @@ int main (int argc, char **argv) {
            char index[USERNAMEHEADER];
            fgets (index, USERNAMEHEADER, stdin);
            buffer = "3\n" + buffer + index;
+           trimStirng(buffer);
            cs.sendMessage(buffer);
            cs.recieveMessage(message);
            printf("%s\n",message.c_str());
          }
       }
       return 0;
+      /*
         cs.sendMessage("0\nif18b030\nMarius\nAre you gay?\nMeele ist ein verbuggtes Drecksgame");
         sleep(1);
 
@@ -114,7 +123,6 @@ int main (int argc, char **argv) {
         cs.sendMessage("3\nMarius\n292");
         cs.recieveMessage(message);
         printf("%s\n",message.c_str());
+        */
 
-    }
-    return 0;
 }
