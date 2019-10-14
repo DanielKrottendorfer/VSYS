@@ -21,11 +21,11 @@ using namespace std;
 
 #include "filehelper.h"
 
-
 std::hash<std::string> hash_fn;
 
-int absolut(int a){
-    if(a<0)
+int absolut(int a)
+{
+    if (a < 0)
     {
         return -a;
     }
@@ -37,65 +37,92 @@ int absolut(int a){
 
 int getThreeDigitHash(string s)
 {
-    int hash =  absolut(hash_fn(s));
-    hash%=1000;
+    int hash = absolut(hash_fn(s));
+    hash %= 1000;
     return hash;
 }
 
-std::string cutOffTillChar(std::string *str, const char r)
+string findDirContentThatStartsWith(string path, string s)
+{
+    DIR *d;
+    struct dirent *dir;
+    d = opendir(path.c_str());
+    if (d != NULL)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+            if (dir->d_name[0] != '.')
+            {
+                string temp(dir->d_name);
+                if (temp.find(s) == 0)
+                {
+                    closedir(d);
+                    return temp;
+                }
+            }
+        }
+    }
+    closedir(d);
+    return "";
+}
+
+std::string cutOffTillStr(std::string *str, string r)
 {
     /*
     looks for the first occurance of a character,
     cuts the string off at the index
     e.g :
 
-        string s = "Are you gay?"
-        string z = cutOffTillChar(&s,' ');
+        string s = "How are you?"
+        string z = cutOffTillStr(&s," ");
         
-        s == "you gay?"
-        z == "Are"
+        s == "are you?"
+        z == "How"
 
-    Note the ' ' in between got cut
+        Note the ' ' in between got cut
     */
-    std::size_t pos = str->find(r);
-    std::string substr = str->substr(0, pos);
+    size_t pos = str->find(r);
+    string substr = str->substr(0, pos);
     *str = str->substr(pos + 1, str->length());
     return substr;
 }
 
-
-using namespace std;
-
 int saveMessage(string message, string mailpath)
 {
-    string sender = cutOffTillChar(&message,'\n');
-    string reciever = cutOffTillChar(&message,'\n');
-    string topic = cutOffTillChar(&message,'\n');
+    string sender = cutOffTillStr(&message, "\n");
+    string reciever = cutOffTillStr(&message, "\n");
+    string topic = cutOffTillStr(&message, "\n");
 
-    if( doesDirectoryExist( (mailpath+"/"+reciever).c_str() ) != 0 )
+    string path = (mailpath + "/" + reciever);
+    if (doesDirectoryExist(path.c_str()) != 0)
     {
-        mkdir((mailpath+"/"+reciever).c_str(), 0700);
+        mkdir(path.c_str(), 0700);
+        printf("make directory %s\n", path.c_str());
     }
 
     int hash = getThreeDigitHash(topic);
+    while (!findDirContentThatStartsWith(path, to_string(hash)).empty())
+    {
+        hash++;
+    }
 
-    FILE * fp;
-    fp = fopen ( (mailpath+"/"+reciever+"/"+ to_string(hash) + " " + topic).c_str() , "w+");
+    FILE *fp;
+    fp = fopen((mailpath + "/" + reciever + "/" + to_string(hash) + " " + topic).c_str(), "w+");
 
-    fprintf(fp, "%s" , ("Von "+sender+"\n\n").c_str());
-    fprintf(fp, "%s" , message.c_str());
+    fprintf(fp, "%s", ("Von " + sender + "\n\n").c_str());
+    fprintf(fp, "%s", message.c_str());
 
     fclose(fp);
 
     return EXIT_SUCCESS;
 }
 
-int listMessages(string message, string mailpath, ClientSocket* socket)
+int listMessages(string message, string mailpath, ClientSocket *socket)
 {
     string user = message;
     string answer;
 
-    if ( doesDirectoryExist((mailpath+"/"+user).c_str()) != 0 )
+    if (doesDirectoryExist((mailpath + "/" + user).c_str()) != 0)
     {
         socket->sendMessage("0");
         return EXIT_FAILURE;
@@ -104,7 +131,7 @@ int listMessages(string message, string mailpath, ClientSocket* socket)
     {
         DIR *d;
         struct dirent *dir;
-        d = opendir((mailpath+"/"+user).c_str());
+        d = opendir((mailpath + "/" + user).c_str());
         if (d != NULL)
         {
             int i = 0;
@@ -118,111 +145,110 @@ int listMessages(string message, string mailpath, ClientSocket* socket)
                 }
             }
             closedir(d);
-            socket->sendMessage(to_string(i)+"\n"+answer);
+            socket->sendMessage(to_string(i) + "\n" + answer);
         }
         return EXIT_SUCCESS;
     }
 }
 
-int readMessage(string message, string mailpath, ClientSocket* socket)
+int readMessage(string message, string mailpath, ClientSocket *socket)
 {
 
-    string user = cutOffTillChar(&message,'\n');
-    string id = cutOffTillChar(&message,'\n');
+    string user = cutOffTillStr(&message, "\n");
+    string id = cutOffTillStr(&message, "\n");
 
-    if ( doesDirectoryExist((mailpath+"/"+user).c_str()) != 0 )
+    string path = (mailpath + "/" + user);
+
+    string temp = findDirContentThatStartsWith(path, id);
+
+    if (temp.empty())
+    {
+        socket->sendMessage("ERR");
+    }
+    else
+    {
+        FILE *pFile;
+        long lSize;
+        char *buffer;
+        size_t result;
+
+        pFile = fopen((mailpath + "/" + user + "/" + temp).c_str(), "r");
+        if (pFile == NULL)
+        {
+            fputs("File error", stderr);
+            exit(1);
+        }
+
+        // obtain file size:
+        fseek(pFile, 0, SEEK_END);
+        lSize = ftell(pFile);
+        rewind(pFile);
+
+        // allocate memory to contain the whole file:
+        buffer = (char *)malloc(sizeof(char) * lSize);
+        if (buffer == NULL)
+        {
+            fputs("Memory error", stderr);
+            exit(2);
+        }
+
+        // copy the file into the buffer:
+        result = fread(buffer, 1, lSize, pFile);
+        if (result != lSize)
+        {
+            fputs("Reading error", stderr);
+            exit(3);
+        }
+
+        /* the whole file is now loaded in the memory buffer. */
+
+        // terminate
+        fclose(pFile);
+        socket->sendMessage(string(buffer));
+        free(buffer);
+    }
+    return EXIT_SUCCESS;
+}
+
+int deleteMessage(string answer, string mailpath, ClientSocket *socket)
+{
+    string user = cutOffTillStr(&answer, "\n");
+    string id = cutOffTillStr(&answer, "\n");
+
+    string path = (mailpath + "/" + user);
+
+    if (doesDirectoryExist(path.c_str()) != 0)
     {
         socket->sendMessage("ERR");
         return EXIT_FAILURE;
     }
     else
     {
-        DIR *d;
-        struct dirent *dir;
-        d = opendir((mailpath+"/"+user).c_str());
-        if (d != NULL)
+        string temp = findDirContentThatStartsWith(path, id);
+        if (temp.empty())
         {
-            while ((dir = readdir(d)) != NULL)
-            {
-                if (dir->d_name[0] != '.')
-                {
-                    string temp(dir->d_name);
-                    if(temp.find(id) == 0){
-
-                        FILE* f = fopen( (mailpath+"/"+user+"/"+temp).c_str(), "r" );
-                        if (f==NULL) {fputs ("File error",stderr); exit (1);}
-
-                        fseek (f , 0 , SEEK_END);
-                        long lSize = ftell (f);
-                        rewind(f);
-
-                        char* buffer = (char*) malloc (sizeof(char)*lSize);
-                        if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
-
-                        int result = fread (buffer,1,lSize,f);
-                        if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
-
-                        socket->sendMessage(string(buffer));
-
-                        fclose(f);
-                        closedir(d);
-                        return EXIT_SUCCESS;
-
-                    }
-                }
-            }
             socket->sendMessage("ERR");
-            closedir(d);
         }
-        return EXIT_FAILURE;
-    }
-}
-int deleteMessage(string message, string mailpath, ClientSocket* socket)
-{
-    string user = cutOffTillChar(&message,'\n');
-    string id = cutOffTillChar(&message,'\n');
-
-    if ( doesDirectoryExist((mailpath+"/"+user).c_str()) != 0 )
-    {
-        socket->sendMessage("ERR");
-        return EXIT_FAILURE;
-    }
-    else
-    {
-        DIR *d;
-        struct dirent *dir;
-        d = opendir((mailpath+"/"+user).c_str());
-        if (d != NULL)
+        else
         {
-            while ((dir = readdir(d)) != NULL)
+            if (remove((mailpath + '/' + user + '/' + temp).c_str()) != 0)
             {
-                if (dir->d_name[0] != '.')
-                {
-                    string temp(dir->d_name);
-                    if(temp.find(id) == 0){
-                        string tmep(dir->d_name);
-                        if( remove( (mailpath+'/'+user+'/'+temp).c_str() ) != 0 )
-                        {
-                            socket->sendMessage("Something went wrong");
-                        }else {
-                            socket->sendMessage("Ok");
-                        }
-                        closedir(d);
-                        return EXIT_SUCCESS;
-                    }
-                }
+                socket->sendMessage("Something went wrong");
             }
-            socket->sendMessage("ERR");
-            closedir(d);
+            else
+            {
+                socket->sendMessage("Ok");
+            }
         }
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
+    return EXIT_SUCCESS;
 }
 
-int handleMessage(string message, string mailpath, ClientSocket* socket)
+int handleMessage(string answer, string mailpath, ClientSocket *socket)
 {
 
-    int requestType = cutOffTillChar(&message, '\n')[0] - '0';
+    int requestType = cutOffTillStr(&answer, "\n")[0] - '0';
 
     /*
     0 => SEND
@@ -235,18 +261,18 @@ int handleMessage(string message, string mailpath, ClientSocket* socket)
     switch (requestType)
     {
     case 0:
-        saveMessage(message, mailpath);
+        return saveMessage(answer, mailpath);
         break;
     case 1:
-        listMessages(message, mailpath, socket);
+        return listMessages(answer, mailpath, socket);
         break;
     case 2:
-        readMessage(message, mailpath, socket);
+        return readMessage(answer, mailpath, socket);
         break;
     case 3:
-        deleteMessage(message, mailpath, socket);
+        return deleteMessage(answer, mailpath, socket);
         break;
     }
 
-    return EXIT_SUCCESS;
+    return EXIT_FAILURE;
 }
