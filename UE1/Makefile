@@ -1,13 +1,13 @@
-all: directories server testclient testserver
+all: directories server client echoserver
 
 server: mailserver.cpp
 	g++ -Wall mailserver.cpp ServerSocket.cpp ClientSocket.cpp messagehandler.cpp filehelper.c sockethelper.c -o ./executables/mailserver
 
-testclient: testclient.cpp
-	g++ -Wall testclient.cpp ClientSocket.cpp -o ./executables/testclient
+client: mailclient.cpp
+	g++ -Wall mailclient.cpp ClientSocket.cpp -o ./executables/mailclient
 
-testserver: testserver.cpp
-	g++ -Wall testserver.cpp ServerSocket.cpp ClientSocket.cpp sockethelper.c -o ./executables/testserver
+echoserver: echoserver.cpp
+	g++ -Wall echoserver.cpp ServerSocket.cpp ClientSocket.cpp sockethelper.c -o ./executables/echoserver
 
 OUT_DIR := ./executables
 

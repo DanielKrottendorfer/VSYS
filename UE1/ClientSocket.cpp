@@ -26,7 +26,7 @@ ClientSocket ClientSocket::connectToSocket(string ip, int port)
 
     if ((client_socket = socket (AF_INET, SOCK_STREAM, 0)) == -1)
     {
-        perror("Socket error");
+        printf("Socket error");
         exit(EXIT_FAILURE);
     }
 
@@ -41,7 +41,7 @@ ClientSocket ClientSocket::connectToSocket(string ip, int port)
     }
     else
     {
-        printf("Connect error - no server available");
+        printf("Connect error - no server available\n");
         exit(EXIT_FAILURE);
     }
 

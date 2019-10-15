@@ -21,71 +21,7 @@ using namespace std;
 
 #include "filehelper.h"
 
-std::hash<std::string> hash_fn;
-
-int absolut(int a)
-{
-    if (a < 0)
-    {
-        return -a;
-    }
-    else
-    {
-        return a;
-    }
-}
-
-int getThreeDigitHash(string s)
-{
-    int hash = absolut(hash_fn(s));
-    hash %= 1000;
-    return hash;
-}
-
-string findDirContentThatStartsWith(string path, string s)
-{
-    DIR *d;
-    struct dirent *dir;
-    d = opendir(path.c_str());
-    if (d != NULL)
-    {
-        while ((dir = readdir(d)) != NULL)
-        {
-            if (dir->d_name[0] != '.')
-            {
-                string temp(dir->d_name);
-                if (temp.find(s) == 0)
-                {
-                    closedir(d);
-                    return temp;
-                }
-            }
-        }
-    }
-    closedir(d);
-    return "";
-}
-
-std::string cutOffTillStr(std::string *str, string r)
-{
-    /*
-    looks for the first occurance of a character,
-    cuts the string off at the index
-    e.g :
-
-        string s = "How are you?"
-        string z = cutOffTillStr(&s," ");
-        
-        s == "are you?"
-        z == "How"
-
-        Note the ' ' in between got cut
-    */
-    size_t pos = str->find(r);
-    string substr = str->substr(0, pos);
-    *str = str->substr(pos + 1, str->length());
-    return substr;
-}
+#include "utils.cpp"
 
 int saveMessage(string message, string mailpath)
 {
@@ -108,6 +44,7 @@ int saveMessage(string message, string mailpath)
 
     FILE *fp;
     fp = fopen((mailpath + "/" + reciever + "/" + to_string(hash) + " " + topic).c_str(), "w+");
+    if (fp==NULL) {fputs ("File error",stderr); exit (1);}
 
     fprintf(fp, "%s", ("Von " + sender + "\n\n").c_str());
     fprintf(fp, "%s", message.c_str());
