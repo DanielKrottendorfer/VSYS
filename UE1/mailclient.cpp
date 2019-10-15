@@ -74,13 +74,18 @@ int main(int argc, char **argv)
       char betreff[GOODEIGHTIES];
       fgets(betreff, GOODEIGHTIES, stdin);
       printf("Write the big Message you got mate\n");
-      char textMail[TEXTMAILSS];
-      fgets(textMail, TEXTMAILSS, stdin);
 
+      string textMailString = "";
+      
+      do{
+        char textMail[TEXTMAILSS];
+        fgets(textMail, TEXTMAILSS, stdin);
+        textMailString = textMailString + string(textMail);
+      }while ( textMailString.find(".\n") != textMailString.length()-2 );
+      
       string senderString(senderr);
       string empfaengerString(empfaenger);
       string betreffString(betreff);
-      string textMailString(textMail);
 
       string messageType2(messageType);
 
