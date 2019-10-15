@@ -7,7 +7,7 @@ using namespace std;
 #ifndef CLIENT_SOCKET
 #define CLIENT_SOCKET
 
-#define BUF 125
+#define BUF 1030
 
 class ClientSocket
 {

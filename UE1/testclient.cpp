@@ -3,10 +3,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 #include <string>
 #include <iostream>
-#define GOODEIGHTIES 81
-#define USERNAMEHEADER 9
+#define GOODEIGHTIES 82
+#define USERNAMEHEADER 10
 #define TEXTMAILSS 927
 using namespace std;
 
@@ -15,13 +16,25 @@ void trimStirng(string& s)
     s.erase(s.find_last_not_of(" \n\r\t")+1);
 }
 
+void signal_handler(int sig) {
+	if(sig == SIGSEGV)
+	{
+		prinft("Port is Missing, Usage: ServerAdresse:Port\n");
+		exit(EXIT_FAILURE);
+	}
+	
+}
+
+
 int main (int argc, char **argv) {
         if( argc < 2 )
         {
           printf("Usage: %s ServerAdresse:Port\n", argv[0]);
           exit(EXIT_FAILURE);
         }
-
+		
+		(void) signal(SIGSEGV, signal_handler);
+		
         string ipAddress = strtok (argv[1], ":");
         int port = atoi(strtok (NULL, ":"));
         string message;
