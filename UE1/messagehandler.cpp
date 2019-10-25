@@ -104,7 +104,8 @@ int readMessage(string message, string mailpath, ClientSocket *socket)
     }
     else
     {
-        FILE *pFile;
+        //test
+	FILE *pFile;
         long lSize;
         char *buffer;
         size_t result;
