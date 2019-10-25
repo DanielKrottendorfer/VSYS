@@ -135,8 +135,10 @@ int readMessage(string message, string mailpath, ClientSocket *socket)
         {
             fputs("Reading error", stderr);
             exit(3);
+        }else{
+            buffer[result] = '\0';
         }
-
+        
         /* the whole file is now loaded in the memory buffer. */
 
         // terminate
