@@ -76,13 +76,13 @@ int main(int argc, char **argv)
       printf("Write the big Message you got mate\n");
 
       string textMailString = "";
-      
+
       do{
         char textMail[TEXTMAILSS];
         fgets(textMail, TEXTMAILSS, stdin);
         textMailString = textMailString + string(textMail);
       }while ( textMailString.find(".\n") != textMailString.length()-2 );
-      
+
       string senderString(senderr);
       string empfaengerString(empfaenger);
       string betreffString(betreff);
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
       cs.sendMessage(buffer);
       printf("%s\n", buffer.c_str());
     }
-    if (messageType[0] == 'L' || messageType[0] == 'l')
+    else if (messageType[0] == 'L' || messageType[0] == 'l')
     {
       printf("What's your username?\n");
       char bufferChar[USERNAMEHEADER];
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
       cs.recieveMessage(message);
       printf("%s\n", message.c_str());
     }
-    if (messageType[0] == 'R' || messageType[0] == 'r')
+    else if (messageType[0] == 'R' || messageType[0] == 'r')
     {
       printf("What's your username?\n");
       char bufferChar[USERNAMEHEADER];
@@ -123,7 +123,7 @@ int main(int argc, char **argv)
       cs.recieveMessage(message);
       printf("%s\n\n", message.c_str());
     }
-    if (messageType[0] == 'D' || messageType[0] == 'd')
+    else if (messageType[0] == 'D' || messageType[0] == 'd')
     {
       printf("What's your username?\n");
       char bufferChar[USERNAMEHEADER];
