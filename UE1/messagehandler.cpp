@@ -92,10 +92,10 @@ int readMessage(string message, string mailpath, ClientSocket *socket)
 {
 
     string user = cutOffTillStr(&message, "\n");
-    string id = cutOffTillStr(&message, "\n");
+    string id = message;
 
     string path = (mailpath + "/" + user);
-
+    
     string temp = findDirContentThatStartsWith(path, id);
 
     if (temp.empty())
@@ -150,10 +150,10 @@ int readMessage(string message, string mailpath, ClientSocket *socket)
     return EXIT_SUCCESS;
 }
 
-int deleteMessage(string answer, string mailpath, ClientSocket *socket)
+int deleteMessage(string message, string mailpath, ClientSocket *socket)
 {
-    string user = cutOffTillStr(&answer, "\n");
-    string id = cutOffTillStr(&answer, "\n");
+    string user = cutOffTillStr(&message, "\n");
+    string id = message;
 
     string path = (mailpath + "/" + user);
     

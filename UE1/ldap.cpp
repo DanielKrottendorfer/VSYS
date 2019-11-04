@@ -67,21 +67,14 @@ bool startLogin()
       rc = ldap_sasl_bind_s(ld,user.c_str(),LDAP_SASL_SIMPLE,&cred,NULL,NULL,&servercredp);
       if(rc == LDAP_SUCCESS)
       {
-         break;
+         cout << "Enjoiment\n";
+         ldap_unbind_ext_s(ld, NULL, NULL);
+         return true;
       }
-      cout << "flasche Eingabe\n";
+      cout << "falsche Eingabe\n";
       i++;
    }
-   bool result = false;
-   if(i)
-   {
-      cout << "DU BIST RAUS\n";
-      result = false;
-   }else{
-      cout << "Enjoiment\n";
-      result = true;
-   }
+   cout << "DU BIST RAUS\n";
    ldap_unbind_ext_s(ld, NULL, NULL);
-   
-   return result;
+   return false;
 }
