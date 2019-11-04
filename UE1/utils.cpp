@@ -49,7 +49,7 @@ string findDirContentThatStartsWith(string path, string s)
             if (dir->d_name[0] != '.')
             {
                 string temp(dir->d_name);
-                if (temp.find(s) == 0)
+                if (temp.find(s) == size_t(0))
                 {
                     closedir(d);
                     return temp;

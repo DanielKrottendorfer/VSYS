@@ -156,7 +156,7 @@ int deleteMessage(string answer, string mailpath, ClientSocket *socket)
     string id = cutOffTillStr(&answer, "\n");
 
     string path = (mailpath + "/" + user);
-
+    
     if (doesDirectoryExist(path.c_str()) != 0)
     {
         socket->sendMessage("ERR");
