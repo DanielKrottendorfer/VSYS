@@ -21,8 +21,8 @@ int main(int argc, char **argv)
    /*
    CHECK IF GIVEN MAILDIRECTORY EXISTS
    */
-   if( argc < 2 ){
-      printf("Usage: %s Mailpoolpath\n", argv[0]);
+   if( argc < 3 ){
+      printf("Usage: %s Mailpoolpath Port\n", argv[0]);
       exit(EXIT_FAILURE);
    }
 
@@ -30,9 +30,13 @@ int main(int argc, char **argv)
       exit(EXIT_FAILURE);
    }
 
+   int port = atoi(argv[2]);
+
    string dir(argv[1]);
 
-   ServerSocket s(12345);
+   ServerSocket s(port);
+
+   printf("Server started with port %d\n",port);
 
    while (1)
    {
