@@ -18,7 +18,7 @@ class ClientSocket
     public:
     
         static ClientSocket connectToSocket(string ip, int port);
-
+        void closeCon();
         ClientSocket(struct sockaddr_in ca, int cs);
         int sendMessage(string message);
         int recieveMessage(string& buffer);

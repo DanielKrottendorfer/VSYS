@@ -1,13 +1,13 @@
 all: directories server client echoserver
 
 server: mailserver.cpp
-	g++ -Wall -pthread mailserver.cpp ServerSocket.cpp ClientSocket.cpp messagehandler.cpp filehelper.c sockethelper.c -o ./executables/mailserver
+	g++ -pthread -Wall mailserver.cpp ServerSocket.cpp ClientSocket.cpp messagehandler.cpp filehelper.c sockethelper.c -o ./executables/mailserver
 
 client: mailclient.cpp
-	g++ -Wall -pthread mailclient.cpp ClientSocket.cpp -o ./executables/mailclient
+	g++ -Wall mailclient.cpp ClientSocket.cpp -o ./executables/mailclient
 
 echoserver: echoserver.cpp
-	g++ -Wall -pthread echoserver.cpp ServerSocket.cpp ClientSocket.cpp sockethelper.c -o ./executables/echoserver
+	g++ -Wall echoserver.cpp ServerSocket.cpp ClientSocket.cpp sockethelper.c -o ./executables/echoserver
 
 OUT_DIR := ./executables
 
