@@ -14,6 +14,8 @@
 #include <vector>
 #include <tuple>
 #include <mutex>
+#include <chrono>
+#include <iostream>
 using namespace std;
 //My Imports
 #include "ServerSocket.hpp"
@@ -27,6 +29,35 @@ using namespace std;
 vector<thread> threadList;
 bool terminateThreads = true;
 mutex dir_mutex;
+vector<tuple<chrono::time_point<chrono::_V2::system_clock,chrono::nanoseconds>,string>> blackList;
+
+chrono::seconds bantime = chrono::seconds(60);
+
+bool checkIfListed(string ip)
+{
+  auto now = chrono::system_clock::now();
+
+  printf("check for expired bans\n");
+  for(int i=0 ; i<blackList.size() ; i++)
+  {
+    auto t = get<0>(blackList[i]);
+    auto elapsed = now-t;
+    if(elapsed>bantime){
+      blackList.erase(blackList.begin()+i);
+      i--;
+    }
+  }
+
+  printf("check for ban\n");
+  for(auto x:blackList)
+  {
+    string s = get<1>(x);
+    if(ip.find(s)>=0)
+      return true;
+  }
+  printf("pass\n");
+  return false;
+}
 
 void signal_handler(int signal)
 {
@@ -66,7 +97,15 @@ void socketThreadFunction(string dir, ClientSocket* c)
         printf("Wait for Client %d ...\n",c->i);
       }
     }while (strncmp (message.c_str(), "quit", 4)  != 0 && terminateThreads);
+  }else
+  {;
+    auto a = chrono::system_clock::now();
+    dir_mutex.lock();
+    blackList.push_back(tuple<chrono::time_point<chrono::_V2::system_clock,chrono::nanoseconds>,string>(a,c->getIP()));
+    printf("%s is now listed",c->getIP().c_str());
+    dir_mutex.unlock();
   }
+  
   
   c->closeCon();
   delete(c);
@@ -99,12 +138,17 @@ int main(int argc, char **argv)
    while (1)
    {
       ClientSocket* c = s.acceptClient();
+      if(checkIfListed(c->getIP()))
+      {
+        c->sendMessage("you are banned");
+        continue;
+      }
+      c->sendMessage("Welcome to myserver, Please enter your command:\n");
       c->i = i;
       printf("accepted \n");
       std::thread t(socketThreadFunction, dir, c);
       threadList.push_back(std::move(t));
       i++;
    }
-
    return 1;
 }

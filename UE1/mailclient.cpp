@@ -55,6 +55,12 @@ int main(int argc, char **argv)
   ClientSocket cs = ClientSocket::connectToSocket(ipAddress, port);
   cs.recieveMessageWait(message);
   printf("%s\n", message.c_str());
+  
+  if(message.find("banned") != string::npos)
+  {
+    cs.closeCon();
+    return EXIT_SUCCESS;
+  }
 
   string uid;
   string pw;
@@ -143,5 +149,6 @@ int main(int argc, char **argv)
       printf("%s\n", message.c_str());
     }
   }
+  cs.closeCon();
   return 0;
 }

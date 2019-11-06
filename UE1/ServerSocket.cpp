@@ -36,13 +36,14 @@ ClientSocket* ServerSocket::acceptClient()
 
     printf("Waiting for connections...\n");
     client_socket = accept ( this->server_socket, (struct sockaddr *) &clientaddress, &addrlen );
+    string ip = inet_ntoa (clientaddress.sin_addr);
     if (client_socket > 0)
     {
-        printf ("Client connected from %s:%d...\n", inet_ntoa (clientaddress.sin_addr),ntohs(clientaddress.sin_port));
-        std::string message = "Welcome to myserver, Please enter your command:\n";
-        send(client_socket, message.c_str(), message.length(),0);
+        printf ("Client connected from %s:%d...\n", ip.c_str(),ntohs(clientaddress.sin_port));
+        //std::string message = "Welcome to myserver, Please enter your command:\n";
+        //send(client_socket, message.c_str(), message.length(),0);
     }
-    return new ClientSocket(clientaddress, client_socket);
+    return new ClientSocket(clientaddress, client_socket, ip);
 }
 
 ServerSocket::~ServerSocket()

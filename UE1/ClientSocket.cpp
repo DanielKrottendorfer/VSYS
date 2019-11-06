@@ -13,8 +13,9 @@
 
 #include <iostream>
 
-ClientSocket::ClientSocket(struct sockaddr_in client_address, int client_socket)
+ClientSocket::ClientSocket(struct sockaddr_in client_address, int client_socket, string ip)
 {
+    this->ip = ip;
     this->client_socket = client_socket;
     this->client_address = client_address;
 }
@@ -45,7 +46,7 @@ ClientSocket ClientSocket::connectToSocket(string ip, int port)
         exit(EXIT_FAILURE);
     }
 
-    return ClientSocket(address, client_socket);
+    return ClientSocket(address, client_socket,ip);
 }
 
 int ClientSocket::sendMessage(string message)
@@ -79,6 +80,11 @@ void ClientSocket::closeCon()
 {
     printf("CLIENTSOCKET IS DEAD FOR REAL NOW\n");
     close(this->client_socket);
+}
+
+string ClientSocket::getIP()
+{
+    return ip;
 }
 
 ClientSocket::~ClientSocket()
