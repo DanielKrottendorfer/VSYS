@@ -58,7 +58,7 @@ void socketThreadFunction(string dir, ClientSocket *c, bool *running)
     else
     {
       sleep(1);
-      break;
+      printf("sleep\n");
     }
   }while (strncmp (message.c_str(), "quit", 4)  != 0 && *running);
   c->closeCon();
