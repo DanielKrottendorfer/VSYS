@@ -6,8 +6,8 @@
 #include <signal.h>
 #include <string>
 #include <iostream>
-#define GOODEIGHTIES 82
-#define USERNAMEHEADER 10
+#define HEADERMAIL 82
+#define RECEIVER 10
 #define TEXTMAILSS 927
 using namespace std;
 
@@ -85,18 +85,18 @@ int main(int argc, char **argv)
 
   while (messageType[0] != 'Q' && messageType[0] != 'q')
   {
-    printf("What do you want to do?\n[S]end\n[L]ist\n[R]ead\n[D]elete\n[Q]uit\n");
+    printf("What would you like to do?\n[S]end\n[L]ist\n[R]ead\n[D]elete\n[Q]uit\n");
     fgets(messageType, sizeof(messageType), stdin);
     string buffer;
     if (messageType[0] == 'S' || messageType[0] == 's')
     {
-      printf("To whom should this mail go to?\n");
-      char empfaenger[USERNAMEHEADER];
-      fgets(empfaenger, USERNAMEHEADER, stdin);
+      printf("Who receives it?\n");
+      char empfaenger[RECEIVER];
+      fgets(empfaenger, RECEIVER, stdin);
       printf("What is the header of the mail?\n");
-      char betreff[GOODEIGHTIES];
-      fgets(betreff, GOODEIGHTIES, stdin);
-      printf("Write the big Message you got mate\n");
+      char betreff[HEADERMAIL];
+      fgets(betreff, HEADERMAIL, stdin);
+      printf("Write the Message.\n");
 
       string textMailString = "";
 
@@ -128,8 +128,8 @@ int main(int argc, char **argv)
     {
       buffer = uid;
       printf("Which mail would you like to read.\n");
-      char index[USERNAMEHEADER];
-      fgets(index, USERNAMEHEADER, stdin);
+      char index[RECEIVER];
+      fgets(index, RECEIVER, stdin);
       buffer = "2\n" + buffer + index;
       trimStirng(buffer);
       cs.sendMessage(buffer);
@@ -140,8 +140,8 @@ int main(int argc, char **argv)
     {
       buffer = uid;
       printf("Which mail would you like to delete.\n");
-      char index[USERNAMEHEADER];
-      fgets(index, USERNAMEHEADER, stdin);
+      char index[RECEIVER];
+      fgets(index, RECEIVER, stdin);
       buffer = "3\n" + buffer + index;
       trimStirng(buffer);
       cs.sendMessage(buffer);
