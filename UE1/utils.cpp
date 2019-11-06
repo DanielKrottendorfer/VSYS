@@ -11,9 +11,9 @@
 
 using namespace std;
 
-void trimStirng(string& s)
+void trimStirng(string &s)
 {
-    s.erase(s.find_last_not_of(" \n\r\t")+1);
+    s.erase(s.find_last_not_of(" \n\r\t") + 1);
 }
 
 std::hash<std::string> hash_fn;
@@ -77,7 +77,7 @@ string cutOffTillStr(string *str, string r)
         Note the ' ' in between got cut
     */
     size_t pos = str->find(r);
-    if(pos == string::npos)
+    if (pos == string::npos)
         return "";
     string substr = str->substr(0, pos);
     *str = str->substr(pos + 1, str->length());

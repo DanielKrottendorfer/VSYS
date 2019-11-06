@@ -6,9 +6,6 @@ server: mailserver.cpp
 client: mailclient.cpp
 	g++ -Wall mailclient.cpp ClientSocket.cpp -o ./executables/mailclient
 
-echoserver: echoserver.cpp
-	g++ -Wall echoserver.cpp ServerSocket.cpp ClientSocket.cpp sockethelper.c -o ./executables/echoserver
-
 OUT_DIR := ./executables
 
 MKDIR_P = mkdir -p

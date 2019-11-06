@@ -25,7 +25,7 @@ ClientSocket ClientSocket::connectToSocket(string ip, int port)
     int client_socket;
     struct sockaddr_in address;
 
-    if ((client_socket = socket (AF_INET, SOCK_STREAM, 0)) == -1)
+    if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         printf("Socket error");
         exit(EXIT_FAILURE);
@@ -33,12 +33,12 @@ ClientSocket ClientSocket::connectToSocket(string ip, int port)
 
     memset(&address, 0, sizeof(address));
     address.sin_family = AF_INET;
-    address.sin_port = htons (port);
-    inet_aton (ip.c_str(), &address.sin_addr);
+    address.sin_port = htons(port);
+    inet_aton(ip.c_str(), &address.sin_addr);
 
-    if (connect ( client_socket, (struct sockaddr *) &address, sizeof(address)) == 0)
+    if (connect(client_socket, (struct sockaddr *)&address, sizeof(address)) == 0)
     {
-        printf("Connection with server (%s) established\n", inet_ntoa (address.sin_addr));
+        printf("Connection with server (%s) established\n", inet_ntoa(address.sin_addr));
     }
     else
     {
@@ -46,31 +46,31 @@ ClientSocket ClientSocket::connectToSocket(string ip, int port)
         exit(EXIT_FAILURE);
     }
 
-    return ClientSocket(address, client_socket,ip);
+    return ClientSocket(address, client_socket, ip);
 }
 
 int ClientSocket::sendMessage(string message)
 {
-    return send(this->client_socket, message.c_str(), message.length(),0);
+    return send(this->client_socket, message.c_str(), message.length(), 0);
 }
 
-int ClientSocket::recieveMessage(string& s)
+int ClientSocket::recieveMessage(string &s)
 {
-    int size=recv(this->client_socket, this->buffer, BUF-1, MSG_DONTWAIT);
-    if (size>0)
+    int size = recv(this->client_socket, this->buffer, BUF - 1, MSG_DONTWAIT);
+    if (size > 0)
     {
-        this->buffer[size]= '\0';
+        this->buffer[size] = '\0';
         s = string(this->buffer);
     }
     return size;
 }
 
-int ClientSocket::recieveMessageWait(string& s)
+int ClientSocket::recieveMessageWait(string &s)
 {
-    int size=recv(this->client_socket, this->buffer, BUF-1, 0);
-    if (size>0)
+    int size = recv(this->client_socket, this->buffer, BUF - 1, 0);
+    if (size > 0)
     {
-        this->buffer[size]= '\0';
+        this->buffer[size] = '\0';
         s = string(this->buffer);
     }
     return size;
@@ -90,5 +90,5 @@ string ClientSocket::getIP()
 ClientSocket::~ClientSocket()
 {
     //printf("Clientsocket closed\n");
-   // close(this->client_socket);
+    // close(this->client_socket);
 }

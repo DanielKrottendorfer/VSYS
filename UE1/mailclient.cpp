@@ -34,8 +34,8 @@ int main(int argc, char **argv)
 
   string input(argv[1]);
 
-  string ipAddress = cutOffTillStr(&input,":");
-  if(ipAddress.empty())
+  string ipAddress = cutOffTillStr(&input, ":");
+  if (ipAddress.empty())
   {
     printf("Usage: %s ServerAdresse:Port\n", argv[0]);
     exit(EXIT_FAILURE);
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
   int port = -1;
   port = stoi(input);
 
-  if(port<0)
+  if (port < 0)
   {
     printf("bad port \n");
     exit(EXIT_FAILURE);
@@ -55,8 +55,8 @@ int main(int argc, char **argv)
   ClientSocket cs = ClientSocket::connectToSocket(ipAddress, port);
   cs.recieveMessageWait(message);
   printf("%s\n", message.c_str());
-  
-  if(message.find("banned") != string::npos)
+
+  if (message.find("banned") != string::npos)
   {
     cs.closeCon();
     return EXIT_SUCCESS;
@@ -65,21 +65,22 @@ int main(int argc, char **argv)
   string uid;
   string pw;
 
-  do{
+  do
+  {
     cout << "UID: ";
-    getline( cin, uid);
-    cout << "PW : "; 
-    getline( cin, pw );
+    getline(cin, uid);
+    cout << "PW : ";
+    getline(cin, pw);
 
-    cs.sendMessage( (uid+"\n"+pw) );
+    cs.sendMessage((uid + "\n" + pw));
     cs.recieveMessageWait(message);
     cout << message << endl;
-  }while(message.find("Failure") != string::npos);
+  } while (message.find("Failure") != string::npos);
 
-  if(message.find("Success") == string::npos)
+  if (message.find("Success") == string::npos)
     return EXIT_SUCCESS;
 
-  uid = uid+"\n";
+  uid = uid + "\n";
 
   char messageType[3] = {'w'};
 
@@ -100,11 +101,12 @@ int main(int argc, char **argv)
 
       string textMailString = "";
 
-      do{
+      do
+      {
         char textMail[TEXTMAILSS];
         fgets(textMail, TEXTMAILSS, stdin);
         textMailString = textMailString + string(textMail);
-      }while ( textMailString.find(".\n") != textMailString.length()-2 );
+      } while (textMailString.find(".\n") != textMailString.length() - 2);
 
       string empfaengerString(empfaenger);
       string betreffString(betreff);

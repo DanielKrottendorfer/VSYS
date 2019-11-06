@@ -14,12 +14,12 @@
 #include "ClientSocket.hpp"
 #include "sockethelper.h"
 
-
 ServerSocket::ServerSocket(int port)
 {
     int server_socket;
     struct sockaddr_in address;
-    if(initServersocket(&server_socket,&address,port) != 0){
+    if (initServersocket(&server_socket, &address, port) != 0)
+    {
         printf("Failed to initialice Serversocket\n");
         exit(EXIT_FAILURE);
     }
@@ -27,7 +27,7 @@ ServerSocket::ServerSocket(int port)
     this->address = address;
 }
 
-ClientSocket* ServerSocket::acceptClient()
+ClientSocket *ServerSocket::acceptClient()
 {
     socklen_t addrlen;
     addrlen = sizeof(struct sockaddr_in);
@@ -35,11 +35,11 @@ ClientSocket* ServerSocket::acceptClient()
     int client_socket;
 
     printf("Waiting for connections...\n");
-    client_socket = accept ( this->server_socket, (struct sockaddr *) &clientaddress, &addrlen );
-    string ip = inet_ntoa (clientaddress.sin_addr);
+    client_socket = accept(this->server_socket, (struct sockaddr *)&clientaddress, &addrlen);
+    string ip = inet_ntoa(clientaddress.sin_addr);
     if (client_socket > 0)
     {
-        printf ("Client connected from %s:%d...\n", ip.c_str(),ntohs(clientaddress.sin_port));
+        printf("Client connected from %s:%d...\n", ip.c_str(), ntohs(clientaddress.sin_port));
         //std::string message = "Welcome to myserver, Please enter your command:\n";
         //send(client_socket, message.c_str(), message.length(),0);
     }

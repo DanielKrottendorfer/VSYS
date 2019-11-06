@@ -42,7 +42,11 @@ int saveMessage(string message, string mailpath)
 
     FILE *fp;
     fp = fopen((mailpath + "/" + reciever + "/" + to_string(hash) + " " + topic).c_str(), "w+");
-    if (fp==NULL) {fputs ("File error",stderr); exit (1);}
+    if (fp == NULL)
+    {
+        fputs("File error", stderr);
+        exit(1);
+    }
 
     fprintf(fp, "%s", ("Von " + sender + "\n\n").c_str());
     fprintf(fp, "%s", message.c_str());
@@ -93,7 +97,7 @@ int readMessage(string message, string mailpath, ClientSocket *socket)
     string id = message;
 
     string path = (mailpath + "/" + user);
-    
+
     string temp = findDirContentThatStartsWith(path, id);
 
     if (temp.empty())
@@ -103,7 +107,7 @@ int readMessage(string message, string mailpath, ClientSocket *socket)
     else
     {
         //test
-	FILE *pFile;
+        FILE *pFile;
         long lSize;
         char *buffer;
         size_t result;
@@ -134,10 +138,12 @@ int readMessage(string message, string mailpath, ClientSocket *socket)
         {
             fputs("Reading error", stderr);
             exit(3);
-        }else{
+        }
+        else
+        {
             buffer[result] = '\0';
         }
-        
+
         /* the whole file is now loaded in the memory buffer. */
 
         // terminate
@@ -154,7 +160,7 @@ int deleteMessage(string message, string mailpath, ClientSocket *socket)
     string id = message;
 
     string path = (mailpath + "/" + user);
-    
+
     if (doesDirectoryExist(path.c_str()) != 0)
     {
         socket->sendMessage("ERR");

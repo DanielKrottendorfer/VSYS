@@ -17,23 +17,23 @@
 #define SEARCHBASE "dc=technikum-wien,dc=at"
 
 using namespace std;
-bool startLogin(ClientSocket* c, int trys)
+bool startLogin(ClientSocket *c, int trys)
 {
-   LDAP *ld;			/* LDAP resource handle */
+   LDAP *ld; /* LDAP resource handle */
 
    BerValue *servercredp;
-   int rc=0;
+   int rc = 0;
 
    int ldapversion = LDAP_VERSION3;
 
    /* setup LDAP connection */
-   if (ldap_initialize(&ld,LDAP_URI) != LDAP_SUCCESS)
+   if (ldap_initialize(&ld, LDAP_URI) != LDAP_SUCCESS)
    {
-      fprintf(stderr,"ldap_init failed");
+      fprintf(stderr, "ldap_init failed");
       return false;
    }
 
-   printf("connected to LDAP server %s\n",LDAP_URI);
+   printf("connected to LDAP server %s\n", LDAP_URI);
 
    if ((rc = ldap_set_option(ld, LDAP_OPT_PROTOCOL_VERSION, &ldapversion)) != LDAP_SUCCESS)
    {
@@ -54,35 +54,36 @@ bool startLogin(ClientSocket* c, int trys)
    string password;
    BerValue cred;
    int i = 0;
-   while(i < trys){
+   while (i < trys)
+   {
       string message;
-      
+
       int size = c->recieveMessageWait(message);
 
-      if( size <= 0)
+      if (size <= 0)
       {
          printf("Client closed remote socket\n");
          return false;
       }
-      user = cutOffTillStr(&message,"\n");
-      user = "uid="+user+",ou=People,dc=technikum-wien,dc=at";
+      user = cutOffTillStr(&message, "\n");
+      user = "uid=" + user + ",ou=People,dc=technikum-wien,dc=at";
       cout << user << " lol \n";
 
       //cout << "Passwort(ACHTUNG PASSWORT WIRD ANGEZEIGT): ";
       password = message;
 
       cred.bv_val = (char *)password.c_str();
-      cred.bv_len=strlen(password.c_str());
+      cred.bv_len = strlen(password.c_str());
 
-      rc = ldap_sasl_bind_s(ld,user.c_str(),LDAP_SASL_SIMPLE,&cred,NULL,NULL,&servercredp);
-      if(rc == LDAP_SUCCESS)
+      rc = ldap_sasl_bind_s(ld, user.c_str(), LDAP_SASL_SIMPLE, &cred, NULL, NULL, &servercredp);
+      if (rc == LDAP_SUCCESS)
       {
          c->sendMessage("Success");
          ldap_unbind_ext_s(ld, NULL, NULL);
          return true;
       }
       i++;
-      if(i == trys)
+      if (i == trys)
          c->sendMessage("NO SOUP FOR YOU !!");
       else
          c->sendMessage("Failure");
