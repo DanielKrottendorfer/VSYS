@@ -77,12 +77,12 @@ int ClientSocket::recieveMessageWait(string& s)
 
 void ClientSocket::closeCon()
 {
-    printf("CLIENTSOCKET IS DEAD FOR REAL NOW\n");
+    printf("Clientsocket closed.\n");
     close(this->client_socket);
 }
 
 ClientSocket::~ClientSocket()
 {
-    printf("CLIENTSOCKET IS DEAD\n");
+    //printf("Clientsocket closed\n");
    // close(this->client_socket);
 }

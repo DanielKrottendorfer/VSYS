@@ -39,7 +39,7 @@ ClientSocket* ServerSocket::acceptClient()
     if (client_socket > 0)
     {
         printf ("Client connected from %s:%d...\n", inet_ntoa (clientaddress.sin_addr),ntohs(clientaddress.sin_port));
-        std::string message = "Welcome to myserver, Please enter your command:\n";
+        std::string message = "Welcome to the TWMailer Server, Please login:\n";
         send(client_socket, message.c_str(), message.length(),0);
     }
     return new ClientSocket(clientaddress, client_socket);

@@ -19,18 +19,18 @@ using namespace std;
 #include "ServerSocket.hpp"
 #include "ClientSocket.hpp"
 #include "messagehandler.hpp"
-
 #include "filehelper.h"
-
 #include "ldap.hpp"
 
+#define LOGINTRYS 3
+
 vector<thread> threadList;
-bool terminateThreads = true;
+bool aliveFlagThread = true;
 mutex dir_mutex;
 
 void signal_handler(int signal)
 {
-  terminateThreads = false;
+  aliveFlagThread = false;
 
   for(int x = 0; x < threadList.size() ; x++)
   {
@@ -43,7 +43,7 @@ void socketThreadFunction(string dir, ClientSocket* c)
 {
   string message;
 
-  if(startLogin(c,3))
+  if(startLogin(c,LOGINTRYS))
   {
     do
     {
@@ -65,7 +65,7 @@ void socketThreadFunction(string dir, ClientSocket* c)
         sleep(1);
         printf("Wait for Client %d ...\n",c->i);
       }
-    }while (strncmp (message.c_str(), "quit", 4)  != 0 && terminateThreads);
+    }while (strncmp (message.c_str(), "quit", 4)  != 0 && aliveFlagThread);
   }
   
   c->closeCon();
