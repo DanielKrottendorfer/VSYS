@@ -21,7 +21,6 @@ using namespace std;
 
 #include "filehelper.h"
 
-vector<ClientSocket> socketList;
 vector<thread> threadList;
 bool terminateThreads = true;
 
@@ -36,7 +35,7 @@ void signal_handler(int signal)
   exit(EXIT_SUCCESS);
 }
 
-void socketThreadFunction(string dir, ClientSocket *c)
+void socketThreadFunction(string dir, ClientSocket* c)
 {
   string message;
   do
@@ -55,10 +54,11 @@ void socketThreadFunction(string dir, ClientSocket *c)
     else
     {
       sleep(1);
-      printf("sleep\n");
+      printf("sleep %d \n",c->i);
     }
   }while (strncmp (message.c_str(), "quit", 4)  != 0 && terminateThreads);
   c->closeCon();
+  delete(c);
 }
 
 int main(int argc, char **argv)
@@ -84,13 +84,15 @@ int main(int argc, char **argv)
 
    printf("Server started with port %d\n",port);
 
+   int i = 0;
    while (1)
    {
-      ClientSocket c = s.acceptClient();
+      ClientSocket* c = s.acceptClient();
+      c->i = i;
       printf("accepted \n");
-      std::thread t(socketThreadFunction, dir, &c);
-      socketList.push_back(std::move(c));
+      std::thread t(socketThreadFunction, dir, c);
       threadList.push_back(std::move(t));
+      i++;
    }
 
    return 1;

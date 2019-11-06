@@ -1,4 +1,4 @@
-all: directories server client echoserver
+all: directories server client 
 
 server: mailserver.cpp
 	g++ -pthread -Wall mailserver.cpp ServerSocket.cpp ClientSocket.cpp messagehandler.cpp filehelper.c sockethelper.c -o ./executables/mailserver

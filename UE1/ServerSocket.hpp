@@ -8,7 +8,7 @@ private:
     int server_socket;
     struct sockaddr_in address;
 public:
-    ClientSocket acceptClient();
+    ClientSocket* acceptClient();
     ServerSocket(int port);
     ~ServerSocket();
 };

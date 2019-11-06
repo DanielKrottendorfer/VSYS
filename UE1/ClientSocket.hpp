@@ -16,7 +16,8 @@ class ClientSocket
         int client_socket;
         char buffer[BUF];
     public:
-    
+
+        int i=0;
         static ClientSocket connectToSocket(string ip, int port);
         void closeCon();
         ClientSocket(struct sockaddr_in ca, int cs);

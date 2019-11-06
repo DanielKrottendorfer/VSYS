@@ -27,7 +27,7 @@ ServerSocket::ServerSocket(int port)
     this->address = address;
 }
 
-ClientSocket ServerSocket::acceptClient()
+ClientSocket* ServerSocket::acceptClient()
 {
     socklen_t addrlen;
     addrlen = sizeof(struct sockaddr_in);
@@ -42,7 +42,7 @@ ClientSocket ServerSocket::acceptClient()
         std::string message = "Welcome to myserver, Please enter your command:\n";
         send(client_socket, message.c_str(), message.length(),0);
     }
-    return ClientSocket(clientaddress, client_socket);
+    return new ClientSocket(clientaddress, client_socket);
 }
 
 ServerSocket::~ServerSocket()
