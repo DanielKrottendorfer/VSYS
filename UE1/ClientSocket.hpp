@@ -22,6 +22,7 @@ class ClientSocket
         ClientSocket(struct sockaddr_in ca, int cs);
         int sendMessage(string message);
         int recieveMessage(string& buffer);
+        int recieveMessageWait(string& buffer);
         ~ClientSocket();
 };
 
