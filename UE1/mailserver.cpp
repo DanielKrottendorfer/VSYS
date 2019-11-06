@@ -22,6 +22,8 @@ using namespace std;
 
 #include "filehelper.h"
 
+#include "ldap.hpp"
+
 vector<thread> threadList;
 bool terminateThreads = true;
 mutex dir_mutex;
@@ -40,27 +42,32 @@ void signal_handler(int signal)
 void socketThreadFunction(string dir, ClientSocket* c)
 {
   string message;
-  do
+
+  if(startLogin(c,3))
   {
-    int size = c->recieveMessage(message);
-    if( size > 0)
+    do
     {
-          dir_mutex.lock();
-          printf("Message received: \n%s\n", message.c_str());
-          handleMessage(message, dir, c);
-          dir_mutex.unlock();
-    }
-    else if (size == 0)
-    {
-      printf("Client closed remote socket\n");
-      break;
-    }
-    else
-    {
-      sleep(1);
-      printf("Wait for Client %d ...\n",c->i);
-    }
-  }while (strncmp (message.c_str(), "quit", 4)  != 0 && terminateThreads);
+      int size = c->recieveMessage(message);
+      if( size > 0)
+      {
+            dir_mutex.lock();
+            printf("Message received: \n%s\n", message.c_str());
+            handleMessage(message, dir, c);
+            dir_mutex.unlock();
+      }
+      else if (size == 0)
+      {
+        printf("Client closed remote socket\n");
+        break;
+      }
+      else
+      {
+        sleep(1);
+        printf("Wait for Client %d ...\n",c->i);
+      }
+    }while (strncmp (message.c_str(), "quit", 4)  != 0 && terminateThreads);
+  }
+  
   c->closeCon();
   delete(c);
 }

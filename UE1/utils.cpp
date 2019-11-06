@@ -61,7 +61,7 @@ string findDirContentThatStartsWith(string path, string s)
     return "";
 }
 
-std::string cutOffTillStr(std::string *str, string r)
+string cutOffTillStr(string *str, string r)
 {
     /*
     looks for the first occurance of a character,

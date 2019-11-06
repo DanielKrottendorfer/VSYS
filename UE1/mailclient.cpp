@@ -55,6 +55,26 @@ int main(int argc, char **argv)
   ClientSocket cs = ClientSocket::connectToSocket(ipAddress, port);
   cs.recieveMessageWait(message);
   printf("%s\n", message.c_str());
+
+  string uid;
+  string pw;
+
+  do{
+    cout << "UID: ";
+    cin >> uid;
+    cout << "PW : "; 
+    cin >> pw;
+
+    cs.sendMessage( (uid+"\n"+pw) );
+    cs.recieveMessageWait(message);
+    cout << message << endl;
+  }while(message.find("Failure") != string::npos);
+
+  if(message.find("Success") == string::npos)
+    return EXIT_SUCCESS;
+
+  uid = uid+"\n";
+
   char messageType[3] = {'w'};
 
   while (messageType[0] != 'Q' && messageType[0] != 'q')
@@ -64,9 +84,6 @@ int main(int argc, char **argv)
     string buffer;
     if (messageType[0] == 'S' || messageType[0] == 's')
     {
-      printf("Your Username?\n");
-      char senderr[USERNAMEHEADER];
-      fgets(senderr, USERNAMEHEADER, stdin);
       printf("To whom should this mail go to?\n");
       char empfaenger[USERNAMEHEADER];
       fgets(empfaenger, USERNAMEHEADER, stdin);
@@ -83,13 +100,12 @@ int main(int argc, char **argv)
         textMailString = textMailString + string(textMail);
       }while ( textMailString.find(".\n") != textMailString.length()-2 );
 
-      string senderString(senderr);
       string empfaengerString(empfaenger);
       string betreffString(betreff);
 
       string messageType2(messageType);
 
-      buffer = "0\n" + senderString + empfaengerString + betreffString + textMailString;
+      buffer = "0\n" + uid + empfaengerString + betreffString + textMailString;
       //char buffer2[BUF] = "0if18b159\nhalt die Fresse\nichbringdiechum\0";
       //send(create_socket, buffer2, strlen (buffer2), 0);
       trimStirng(buffer);
@@ -98,11 +114,7 @@ int main(int argc, char **argv)
     }
     else if (messageType[0] == 'L' || messageType[0] == 'l')
     {
-      printf("What's your username?\n");
-      char bufferChar[USERNAMEHEADER];
-      fgets(bufferChar, USERNAMEHEADER, stdin);
-      buffer = bufferChar;
-      buffer = "1\n" + buffer;
+      buffer = "1\n" + uid;
       trimStirng(buffer);
       cs.sendMessage(buffer);
       cs.recieveMessageWait(message);
@@ -110,10 +122,7 @@ int main(int argc, char **argv)
     }
     else if (messageType[0] == 'R' || messageType[0] == 'r')
     {
-      printf("What's your username?\n");
-      char bufferChar[USERNAMEHEADER];
-      fgets(bufferChar, USERNAMEHEADER, stdin);
-      buffer = bufferChar;
+      buffer = uid;
       printf("Which mail would you like to read.\n");
       char index[USERNAMEHEADER];
       fgets(index, USERNAMEHEADER, stdin);
@@ -125,10 +134,7 @@ int main(int argc, char **argv)
     }
     else if (messageType[0] == 'D' || messageType[0] == 'd')
     {
-      printf("What's your username?\n");
-      char bufferChar[USERNAMEHEADER];
-      fgets(bufferChar, USERNAMEHEADER, stdin);
-      buffer = bufferChar;
+      buffer = uid;
       printf("Which mail would you like to delete.\n");
       char index[USERNAMEHEADER];
       fgets(index, USERNAMEHEADER, stdin);

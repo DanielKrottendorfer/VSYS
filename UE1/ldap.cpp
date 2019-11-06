@@ -10,12 +10,15 @@
 #include <iostream>
 #include <string>
 
+#include "ClientSocket.hpp"
+#include "utils.hpp"
+
 #define LDAP_URI "ldap://ldap.technikum-wien.at:389"
 #define SEARCHBASE "dc=technikum-wien,dc=at"
 #define SCOPE LDAP_SCOPE_SUBTREE
 
 using namespace std;
-bool startLogin()
+bool startLogin(ClientSocket* c, int trys)
 {
    LDAP *ld;			/* LDAP resource handle */
 
@@ -52,14 +55,22 @@ bool startLogin()
    string password;
    BerValue cred;
    int i = 0;
-   while(i < 3){
-      cout << "Username: ";
-      cin >> user;
-      user = "uid="+user+",ou=People,dc=technikum-wien,dc=at";
-      //cout << user << " lol \n";
+   while(i < trys){
+      string message;
+      
+      int size = c->recieveMessageWait(message);
 
-      cout << "Passwort(ACHTUNG PASSWORT WIRD ANGEZEIGT): ";
-      cin >> password;
+      if( size <= 0)
+      {
+         printf("Client closed remote socket\n");
+         return "";
+      }
+      user = cutOffTillStr(&message,"\n");
+      user = "uid="+user+",ou=People,dc=technikum-wien,dc=at";
+      cout << user << " lol \n";
+
+      //cout << "Passwort(ACHTUNG PASSWORT WIRD ANGEZEIGT): ";
+      password = message;
 
       cred.bv_val = (char *)password.c_str();
       cred.bv_len=strlen(password.c_str());
@@ -67,14 +78,16 @@ bool startLogin()
       rc = ldap_sasl_bind_s(ld,user.c_str(),LDAP_SASL_SIMPLE,&cred,NULL,NULL,&servercredp);
       if(rc == LDAP_SUCCESS)
       {
-         cout << "Enjoiment\n";
+         c->sendMessage("Success");
          ldap_unbind_ext_s(ld, NULL, NULL);
          return true;
       }
-      cout << "falsche Eingabe\n";
       i++;
+      if(i == trys)
+         c->sendMessage("NO SOUP FOR YOU !!");
+      else
+         c->sendMessage("Failure");
    }
-   cout << "DU BIST RAUS\n";
    ldap_unbind_ext_s(ld, NULL, NULL);
    return false;
 }

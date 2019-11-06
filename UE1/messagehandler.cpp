@@ -21,7 +21,7 @@ using namespace std;
 
 #include "filehelper.h"
 
-#include "utils.cpp"
+#include "utils.hpp"
 
 int saveMessage(string message, string mailpath)
 {
