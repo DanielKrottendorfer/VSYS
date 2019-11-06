@@ -78,7 +78,7 @@ int ClientSocket::recieveMessageWait(string &s)
 
 void ClientSocket::closeCon()
 {
-    printf("Clientsocket closed.\n");
+    printf("Clientsocket closed. %d\n",this->i);
     close(this->client_socket);
 }
 
