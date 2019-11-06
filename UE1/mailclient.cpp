@@ -53,7 +53,7 @@ int main(int argc, char **argv)
   //int port = atoi(strtok(NULL, ":"));
   string message;
   ClientSocket cs = ClientSocket::connectToSocket(ipAddress, port);
-  cs.recieveMessage(message);
+  cs.recieveMessageWait(message);
   printf("%s\n", message.c_str());
   char messageType[3] = {'w'};
 
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
       buffer = "1\n" + buffer;
       trimStirng(buffer);
       cs.sendMessage(buffer);
-      cs.recieveMessage(message);
+      cs.recieveMessageWait(message);
       printf("%s\n", message.c_str());
     }
     else if (messageType[0] == 'R' || messageType[0] == 'r')
@@ -120,7 +120,7 @@ int main(int argc, char **argv)
       buffer = "2\n" + buffer + index;
       trimStirng(buffer);
       cs.sendMessage(buffer);
-      cs.recieveMessage(message);
+      cs.recieveMessageWait(message);
       printf("%s\n\n", message.c_str());
     }
     else if (messageType[0] == 'D' || messageType[0] == 'd')
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
       buffer = "3\n" + buffer + index;
       trimStirng(buffer);
       cs.sendMessage(buffer);
-      cs.recieveMessage(message);
+      cs.recieveMessageWait(message);
       printf("%s\n", message.c_str());
     }
   }

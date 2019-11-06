@@ -22,24 +22,21 @@ using namespace std;
 #include "filehelper.h"
 
 vector<ClientSocket> socketList;
-vector<tuple<thread,bool>> threadboolList;
+vector<thread> threadList;
+bool terminateThreads = true;
 
 void signal_handler(int signal)
 {
-  for(int x = 0; x < threadboolList.size() ; x++)
-  {
-    bool * b = &(get<1>(threadboolList[x]));
-    *b = false;
-  }
+  terminateThreads = false;
 
-  for(int x = 0; x < threadboolList.size() ; x++)
+  for(int x = 0; x < threadList.size() ; x++)
   {
-    (get<0>(threadboolList[x])).join();
+    threadList.at(x).join();
   }
   exit(EXIT_SUCCESS);
 }
 
-void socketThreadFunction(string dir, ClientSocket *c, bool *running)
+void socketThreadFunction(string dir, ClientSocket *c)
 {
   string message;
   do
@@ -58,12 +55,11 @@ void socketThreadFunction(string dir, ClientSocket *c, bool *running)
     else
     {
       sleep(1);
-      break;
+      printf("sleep\n");
     }
-  }while (strncmp (message.c_str(), "quit", 4)  != 0 && *running);
+  }while (strncmp (message.c_str(), "quit", 4)  != 0 && terminateThreads);
   c->closeCon();
 }
-
 
 int main(int argc, char **argv)
 {
@@ -90,12 +86,11 @@ int main(int argc, char **argv)
 
    while (1)
    {
-      bool b = true;
       ClientSocket c = s.acceptClient();
       printf("accepted \n");
-      std::thread t(socketThreadFunction, dir, &c, &b);
+      std::thread t(socketThreadFunction, dir, &c);
       socketList.push_back(std::move(c));
-      threadboolList.push_back(tuple<thread,bool>(std::move(t), std::move(b)));
+      threadList.push_back(std::move(t));
    }
 
    return 1;

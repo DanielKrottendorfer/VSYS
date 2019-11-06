@@ -64,8 +64,20 @@ int ClientSocket::recieveMessage(string& s)
     return size;
 }
 
+int ClientSocket::recieveMessageWait(string& s)
+{
+    int size=recv(this->client_socket, this->buffer, BUF-1, 0);
+    if (size>0)
+    {
+        this->buffer[size]= '\0';
+        s = string(this->buffer);
+    }
+    return size;
+}
+
 void ClientSocket::closeCon()
 {
+    printf("CLIENTSOCKET IS DEAD FOR REAL NOW\n");
     close(this->client_socket);
 }
 
