@@ -13,6 +13,7 @@
 #include <thread>
 #include <vector>
 #include <tuple>
+#include <mutex>
 using namespace std;
 //My Imports
 #include "ServerSocket.hpp"
@@ -23,6 +24,7 @@ using namespace std;
 
 vector<thread> threadList;
 bool terminateThreads = true;
+mutex dir_mutex;
 
 void signal_handler(int signal)
 {
@@ -43,8 +45,10 @@ void socketThreadFunction(string dir, ClientSocket* c)
     int size = c->recieveMessage(message);
     if( size > 0)
     {
-        printf("Message received: \n%s\n", message.c_str());
-        handleMessage(message, dir, c);
+          dir_mutex.lock();
+          printf("Message received: \n%s\n", message.c_str());
+          handleMessage(message, dir, c);
+          dir_mutex.unlock();
     }
     else if (size == 0)
     {
@@ -54,7 +58,7 @@ void socketThreadFunction(string dir, ClientSocket* c)
     else
     {
       sleep(1);
-      printf("sleep %d \n",c->i);
+      printf("Wait for Client %d ...\n",c->i);
     }
   }while (strncmp (message.c_str(), "quit", 4)  != 0 && terminateThreads);
   c->closeCon();
