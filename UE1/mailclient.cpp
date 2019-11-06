@@ -61,9 +61,9 @@ int main(int argc, char **argv)
 
   do{
     cout << "UID: ";
-    cin >> uid;
+    getline( cin, uid);
     cout << "PW : "; 
-    cin >> pw;
+    getline( cin, pw );
 
     cs.sendMessage( (uid+"\n"+pw) );
     cs.recieveMessageWait(message);
@@ -106,8 +106,6 @@ int main(int argc, char **argv)
       string messageType2(messageType);
 
       buffer = "0\n" + uid + empfaengerString + betreffString + textMailString;
-      //char buffer2[BUF] = "0if18b159\nhalt die Fresse\nichbringdiechum\0";
-      //send(create_socket, buffer2, strlen (buffer2), 0);
       trimStirng(buffer);
       cs.sendMessage(buffer);
       printf("%s\n", buffer.c_str());
