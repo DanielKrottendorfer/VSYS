@@ -26,19 +26,20 @@ using namespace std;
 
 #define LOGINTRYS 3
 
+ServerSocket* s = nullptr;
+
 vector<thread> threadList;
 bool aliveFlagThread = true;
 mutex dir_mutex;
-vector<tuple<chrono::time_point<chrono::_V2::system_clock,chrono::nanoseconds>,string>> blackList;
 
-chrono::seconds bantime = chrono::seconds(60);
+vector<tuple<chrono::time_point<chrono::_V2::system_clock,chrono::nanoseconds>,string>> blackList;
+chrono::seconds bantime = chrono::seconds(10);
 
 bool checkIfListed(string ip)
 {
   auto now = chrono::system_clock::now();
 
-  printf("check for expired bans\n");
-  for(int i=0 ; i<blackList.size() ; i++)
+  for(unsigned int i=0 ; i < blackList.size() ; i++)
   {
     auto t = get<0>(blackList[i]);
     auto elapsed = now-t;
@@ -48,14 +49,12 @@ bool checkIfListed(string ip)
     }
   }
 
-  printf("check for ban\n");
   for(auto x:blackList)
   {
     string s = get<1>(x);
     if(ip.find(s)>=0)
       return true;
   }
-  printf("pass\n");
   return false;
 }
 
@@ -63,10 +62,11 @@ void signal_handler(int signal)
 {
   aliveFlagThread = false;
 
-  for(int x = 0; x < threadList.size() ; x++)
+  for(unsigned int x = 0; x < threadList.size() ; x++)
   {
     threadList.at(x).join();
   }
+  delete(s);
   exit(EXIT_SUCCESS);
 }
 
@@ -130,14 +130,14 @@ int main(int argc, char **argv)
 
    string dir(argv[1]);
 
-   ServerSocket s(port);
+   s = new ServerSocket(port);
 
    printf("Server started with port %d\n",port);
 
    int i = 0;
    while (1)
    {
-      ClientSocket* c = s.acceptClient();
+      ClientSocket* c = s->acceptClient();
       if(checkIfListed(c->getIP()))
       {
         c->sendMessage("you are banned");
