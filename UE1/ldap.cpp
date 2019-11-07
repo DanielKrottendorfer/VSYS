@@ -49,7 +49,6 @@ bool startLogin(ClientSocket *c, int trys)
       return false;
    }
 
-   /* anonymous bind */
    string user;
    string password;
    BerValue cred;
@@ -67,9 +66,7 @@ bool startLogin(ClientSocket *c, int trys)
       }
       user = cutOffTillStr(&message, "\n");
       user = "uid=" + user + ",ou=People,dc=technikum-wien,dc=at";
-      cout << user << " lol \n";
 
-      //cout << "Passwort(ACHTUNG PASSWORT WIRD ANGEZEIGT): ";
       password = message;
 
       cred.bv_val = (char *)password.c_str();

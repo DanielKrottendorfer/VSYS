@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
+#include <termios.h>
 #include <string>
 #include <iostream>
 #define HEADERMAIL 82
@@ -21,7 +22,22 @@ void signal_handler(int sig)
     exit(EXIT_FAILURE);
   }
 }
+void maskpass(string *pwd)
+{
+    static struct termios oldt, newt;
+    // saving the old settings of STDIN_FILENO and copy settings for resetting
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    // setting the approriate bit in the termios struct
+    newt.c_lflag &= ~(ECHO);
+    // setting the new bits
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
+    getline(cin, *pwd);
+
+    // resetting our old STDIN_FILENO
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+}
 int main(int argc, char **argv)
 {
   if (argc < 2)
@@ -70,7 +86,8 @@ int main(int argc, char **argv)
     cout << "UID: ";
     getline(cin, uid);
     cout << "PW : ";
-    getline(cin, pw);
+    maskpass(&pw);
+    cout << endl;
 
     cs.sendMessage((uid + "\n" + pw));
     cs.recieveMessageWait(message);
