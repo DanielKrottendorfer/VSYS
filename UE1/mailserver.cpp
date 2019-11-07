@@ -39,6 +39,7 @@ bool checkIfListed(string ip)
 {
   auto now = chrono::system_clock::now();
 
+  //check for expired bans
   for (unsigned int i = 0; i < blackList.size(); i++)
   {
     auto t = get<0>(blackList[i]);
@@ -50,6 +51,7 @@ bool checkIfListed(string ip)
     }
   }
 
+  //check if banned
   for (auto x : blackList)
   {
     string s = get<1>(x);
@@ -77,12 +79,14 @@ void socketThreadFunction(string dir, ClientSocket *c)
 
   if (startLogin(c, LOGINTRYS))
   {
+    //login zum fh-ldap-server
     do
     {
       int size = c->recieveMessage(message);
       if (size > 0)
       {
         dir_mutex.lock();
+        // wenn messagesize > 0 wird mutex gelockt und dann abgearbeitet
         printf("Message received: \n%s\n", message.c_str());
         handleMessage(message, dir, c);
         dir_mutex.unlock();
@@ -101,6 +105,7 @@ void socketThreadFunction(string dir, ClientSocket *c)
   }
   else
   {
+    // wenn login fehlschlägt wird momentane Zeit festgehalten und dann geblacklisted
     auto a = chrono::system_clock::now();
     dir_mutex.lock();
     blackList.push_back(tuple<chrono::time_point<chrono::_V2::system_clock, chrono::nanoseconds>, string>(a, c->getIP()));
