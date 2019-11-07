@@ -123,7 +123,7 @@ int main(int argc, char **argv)
         char textMail[TEXTMAILSS];
         fgets(textMail, TEXTMAILSS, stdin);
         textMailString = textMailString + string(textMail);
-      } while (textMailString.find(".\n") != textMailString.length() - 2);
+      } while (textMailString.find("\n.\n") == string::npos);
 
       string empfaengerString(empfaenger);
       string betreffString(betreff);

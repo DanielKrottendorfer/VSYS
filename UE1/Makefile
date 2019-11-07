@@ -1,10 +1,10 @@
 all: directories server client 
 
 server: mailserver.cpp
-	g++ -pthread -Wall mailserver.cpp ServerSocket.cpp ClientSocket.cpp messagehandler.cpp ldap.cpp utils.cpp filehelper.c sockethelper.c -o ./executables/mailserver -lldap -llber
+	g++ -pthread -std=c++11 -Wall mailserver.cpp ServerSocket.cpp ClientSocket.cpp messagehandler.cpp ldap.cpp utils.cpp filehelper.c sockethelper.c -o ./executables/mailserver -lldap -llber
 
 client: mailclient.cpp
-	g++ -Wall mailclient.cpp ClientSocket.cpp -o ./executables/mailclient
+	g++ -std=c++11 -Wall mailclient.cpp ClientSocket.cpp -o ./executables/mailclient
 
 OUT_DIR := ./executables
 

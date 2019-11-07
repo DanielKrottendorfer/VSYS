@@ -63,7 +63,7 @@ int listMessages(string message, string mailpath, ClientSocket *socket)
 
     if (doesDirectoryExist((mailpath + "/" + user).c_str()) != 0)
     {
-        socket->sendMessage("0");
+        socket->sendMessage("0\n");
         return EXIT_FAILURE;
     }
     else
